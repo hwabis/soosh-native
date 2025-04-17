@@ -1,7 +1,9 @@
+#include "henlo.h"
 #include <iostream>
 
-int noooo()
+int main()
 {
     std::cout << "henlo";
+    noooo();
     return 0;
 }
