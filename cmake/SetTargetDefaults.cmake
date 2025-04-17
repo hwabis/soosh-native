@@ -12,6 +12,7 @@ function(set_target_defaults target)
       /analyze
       /external:anglebrackets
       /external:W0
+      /EHsc
 
       /wd26440 # Do not litter noexcept everywhere
     )

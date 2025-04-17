@@ -8,4 +8,5 @@ set_target_defaults(soosh-native-client-app)
 
 target_link_libraries(soosh-native-client-app PRIVATE
   soosh-native-client-lib
+  CLI11::CLI11
 )
