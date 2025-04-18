@@ -6,3 +6,10 @@ FetchContent_Declare(
     GIT_TAG v2.5.0
 )
 FetchContent_MakeAvailable(cli11)
+
+FetchContent_Declare(
+    boost
+    GIT_REPOSITORY https://github.com/boostorg/boost.git
+    GIT_TAG boost-1.88.0
+)
+FetchContent_MakeAvailable(boost)
