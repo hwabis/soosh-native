@@ -1,12 +1,8 @@
-#include "henlo.h"
+#include "client.h"
 #include <CLI/CLI.hpp>
-#include <iostream>
 
 int main(int argc, char **argv)
 {
-    std::cout << "henlo";
-    noooo();
-
     CLI::App app{"Client for Soosh Native"};
     argv = app.ensure_utf8(argv);
 
@@ -15,4 +11,7 @@ int main(int argc, char **argv)
         ->required();
 
     CLI11_PARSE(app, argc, argv);
+
+    soosh::Client client;
+    client.Start(serverAddress);
 }
