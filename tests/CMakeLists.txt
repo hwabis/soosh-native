@@ -11,5 +11,3 @@ FetchContent_MakeAvailable(googletest)
 add_test_executable(soosh-native-client-tests soosh-native-client-lib
   test_henlo.cc
 )
-
-add_test(NAME AdderTest COMMAND soosh-native-client-tests)
