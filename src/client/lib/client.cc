@@ -4,7 +4,7 @@
 namespace soosh
 {
 
-void Client::Start(const std::string &serverAddress)
+void Client::Run(const std::string &serverAddress)
 {
 }
 

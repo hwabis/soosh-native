@@ -1,5 +1,4 @@
 include(FetchContent)
-include(${CMAKE_SOURCE_DIR}/cmake/AddTestExecutable.cmake)
 
 FetchContent_Declare(
   googletest
@@ -8,6 +7,5 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-add_test_executable(soosh-native-client-tests soosh-native-client-lib
-  test_henlo.cc
-)
+add_subdirectory(client)
+add_subdirectory(server)

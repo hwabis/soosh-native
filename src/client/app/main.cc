@@ -7,11 +7,10 @@ int main(int argc, char **argv)
     argv = app.ensure_utf8(argv);
 
     std::string serverAddress;
-    app.add_option("--connect", serverAddress, "Connect to the specified server address")
-        ->required();
+    app.add_option("--connect", serverAddress, "Server address to connect to")->required();
 
     CLI11_PARSE(app, argc, argv);
 
     soosh::Client client;
-    client.Start(serverAddress);
+    client.Run(serverAddress);
 }

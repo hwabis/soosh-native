@@ -14,12 +14,9 @@ function(set_target_defaults target)
       /external:W0
       /EHsc
       /wd26440 # Do not litter noexcept everywhere
-      /fsanitize=address
-      /Zi
-    )
-    target_link_options(${target} PRIVATE
-      /DEBUG
-      /INCREMENTAL:NO
+      # microsoft plzzz :((( https://developercommunity.visualstudio.com/t/Enabling-Address-Sanitizer-results-in-er/10053975
+      # /fsanitize=address
+      # /Zi
     )
     # todo: any way to enable include cleanup in visual studio from here?
   endif()

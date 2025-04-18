@@ -5,10 +5,10 @@
 namespace soosh
 {
 
-class Client
+class Server
 {
   public:
-    void Run(const std::string &serverAddress);
+    void Run(int port);
 
   private:
     void print(const std::string &message) const;
