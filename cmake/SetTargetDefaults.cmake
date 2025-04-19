@@ -9,9 +9,9 @@ function(set_target_defaults target)
     target_compile_options(${target} PRIVATE
       /std:c++20
       /W4
-      /analyze
       /external:anglebrackets
       /external:W0
+      /analyze:external-
       /EHsc
       /wd26440 # Do not litter noexcept everywhere
       # microsoft plzzz :((( https://developercommunity.visualstudio.com/t/Enabling-Address-Sanitizer-results-in-er/10053975
@@ -20,5 +20,5 @@ function(set_target_defaults target)
     )
     # todo: any way to enable include cleanup in visual studio from here?
   endif()
-  # todo: g++/clang, cppcheck
+  # todo: g++/clang, cppcheck automatically
 endfunction()

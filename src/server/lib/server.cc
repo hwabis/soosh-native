@@ -1,8 +1,5 @@
 #include "server.h"
-#pragma warning(push)
-#pragma warning(disable : 6387 6258 6001 6255 6031 6313)
 #include <boost/asio.hpp>
-#pragma warning(pop)
 #include <iostream>
 
 namespace ip = boost::asio::ip;
