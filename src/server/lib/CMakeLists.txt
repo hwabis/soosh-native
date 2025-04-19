@@ -10,6 +10,6 @@ target_include_directories(soosh-native-server-lib PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_include_directories(soosh-native-server-lib SYSTEM PRIVATE
-  ${Boost_INCLUDE_DIRS}
+target_link_libraries(soosh-native-server-lib PRIVATE
+  Boost::asio
 )
