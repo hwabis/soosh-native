@@ -17,6 +17,7 @@ void Client::Start()
         print("Connected to server at " + serverEndpoint_.address().to_string() + ":" +
               std::to_string(serverEndpoint_.port()));
         listenForMessages();
+        std::jthread inputThread(&Client::handleInput, this);
         ioContext_.run();
     }
     catch (const boost::system::system_error &e)
@@ -36,15 +37,54 @@ void Client::listenForMessages()
                 std::istream input(buffer.get());
                 std::string message;
                 std::getline(input, message);
-                std::cout << "Server says: " << message << std::endl;
-
+                print("Server says: " + message);
                 listenForMessages();
             }
             else
             {
-                std::cerr << "Error while receiving message: " << ec.message() << std::endl;
+                if (ec == boost::asio::error::eof || ec == boost::asio::error::connection_reset)
+                {
+                    print("Server disconnected.");
+                    socket_.close();
+                }
+                else
+                {
+                    print("Error while receiving message: " + ec.message());
+                }
             }
         });
+}
+
+void Client::handleInput()
+{
+    try
+    {
+        while (true)
+        {
+            std::string userInput;
+            std::cout << "> ";
+            std::getline(std::cin, userInput);
+
+            if (userInput.empty())
+            {
+                continue;
+            }
+
+            if (userInput == "quit")
+            {
+                print("Exiting client...");
+                socket_.close();
+                break;
+            }
+
+            // Send the message to the server
+            boost::asio::write(socket_, boost::asio::buffer(userInput + "\n"));
+        }
+    }
+    catch (const boost::system::system_error &e)
+    {
+        print("Error sending message: " + std::string(e.what()));
+    }
 }
 
 void Client::print(const std::string &message) const

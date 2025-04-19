@@ -16,6 +16,7 @@ class Server
 
   private:
     void startAccept();
+    void readMessage(std::shared_ptr<ip::tcp::socket> socket);
     void sendMessage(std::shared_ptr<ip::tcp::socket> socket, const std::string &message);
     void print(const std::string &message) const;
     boost::asio::io_context ioContext_;

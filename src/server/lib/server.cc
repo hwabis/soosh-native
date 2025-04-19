@@ -24,10 +24,41 @@ void Server::startAccept()
         if (!ec)
         {
             print("Client connected!");
+            readMessage(socket);
             sendMessage(socket, "Hello from encapsulated server!\n");
         }
         startAccept();
     });
+}
+
+void Server::readMessage(std::shared_ptr<ip::tcp::socket> socket)
+{
+    auto buffer = std::make_shared<boost::asio::streambuf>();
+    boost::asio::async_read_until(
+        *socket, *buffer, '\n',
+        [this, socket, buffer](const boost::system::error_code &ec, std::size_t bytesTransferred) {
+            if (!ec)
+            {
+                std::istream input(buffer.get());
+                std::string message;
+                std::getline(input, message);
+
+                print(message);
+
+                readMessage(socket);
+            }
+            else
+            {
+                if (ec == boost::asio::error::eof || ec == boost::asio::error::connection_reset)
+                {
+                    print("Client disconnected.");
+                }
+                else
+                {
+                    print("Error receiving message: " + ec.message());
+                }
+            }
+        });
 }
 
 void Server::sendMessage(std::shared_ptr<ip::tcp::socket> socket, const std::string &message)
@@ -51,7 +82,14 @@ void Server::sendMessage(std::shared_ptr<ip::tcp::socket> socket, const std::str
             }
             else
             {
-                print("Error sending message: " + ec.message());
+                if (ec == boost::asio::error::connection_reset || ec == boost::asio::error::eof)
+                {
+                    print("Client disconnected. No further messages will be sent to this client.");
+                }
+                else
+                {
+                    print("Error sending message: " + ec.message());
+                }
             }
         });
 }
