@@ -15,9 +15,6 @@ class Client
     void Start();
 
   private:
-    void listenForMessages();
-    void handleInput();
-    void print(const std::string &message) const;
     boost::asio::io_context ioContext_;
     ip::tcp::socket socket_;
     ip::tcp::endpoint serverEndpoint_;

@@ -11,7 +11,7 @@ Server::Server(unsigned short port)
     startAccept();
 }
 
-void Server::Run()
+void Server::Start()
 {
     print("Server started!");
     ioContext_.run();

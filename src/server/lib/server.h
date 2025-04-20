@@ -11,8 +11,8 @@ namespace soosh
 class Server
 {
   public:
-    Server(unsigned short port);
-    void Run();
+    explicit Server(unsigned short port);
+    void Start();
 
   private:
     void startAccept();

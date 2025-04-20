@@ -12,5 +12,5 @@ int main(int argc, char **argv)
     CLI11_PARSE(app, argc, argv);
 
     soosh::Server server(port);
-    server.Run();
+    server.Start();
 }
