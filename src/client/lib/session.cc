@@ -9,11 +9,11 @@ void Session::Start() { listen(); }
 
 void Session::SendMessage(const std::string &message) {
   auto self(shared_from_this());
-  auto messagePtr = std::make_shared<std::string>(message + "\n");
+  auto fullMessage = std::make_shared<std::string>(message + "\n");
   boost::asio::async_write(
-      socket_, boost::asio::buffer(*messagePtr),
-      [this, self, messagePtr](const boost::system::error_code &ec,
-                               std::size_t) {
+      socket_, boost::asio::buffer(*fullMessage),
+      [this, self, fullMessage](const boost::system::error_code &ec,
+                                std::size_t) {
         if (ec) {
           std::cerr << "Error sending message: " << ec.message() << std::endl;
         }
@@ -45,7 +45,10 @@ void Session::handleReceiveError(const boost::system::error_code &ec) {
     std::cerr << "Error while receiving message: " << ec.message() << std::endl;
   }
 
-  socket_.close();
+  if (socket_.is_open()) {
+    socket_.shutdown(ip::tcp::socket::shutdown_both);
+    socket_.close();
+  }
 }
 
 } // namespace soosh
