@@ -5,22 +5,21 @@
 
 namespace ip = boost::asio::ip;
 
-namespace soosh
-{
+namespace soosh {
 
-class Server
-{
-  public:
-    explicit Server(unsigned short port);
-    void Start();
+class Server {
+public:
+  explicit Server(unsigned short port);
+  void Start();
 
-  private:
-    void startAccept();
-    void readMessage(std::shared_ptr<ip::tcp::socket> socket);
-    void sendMessage(std::shared_ptr<ip::tcp::socket> socket, const std::string &message);
-    void print(const std::string &message) const;
-    boost::asio::io_context ioContext_;
-    ip::tcp::acceptor acceptor_;
+private:
+  void startAccept();
+  void readMessage(std::shared_ptr<ip::tcp::socket> socket);
+  void sendMessage(std::shared_ptr<ip::tcp::socket> socket,
+                   const std::string &message);
+  void print(const std::string &message) const;
+  boost::asio::io_context ioContext_;
+  ip::tcp::acceptor acceptor_;
 };
 
 } // namespace soosh
