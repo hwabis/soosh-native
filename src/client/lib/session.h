@@ -9,7 +9,7 @@ namespace soosh {
 
 class Session : public std::enable_shared_from_this<Session> {
 public:
-  Session(ip::tcp::socket socket);
+  explicit Session(ip::tcp::socket socket);
   void Start();
   void SendMessage(const std::string &message);
 

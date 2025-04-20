@@ -2,6 +2,7 @@ include(${CMAKE_SOURCE_DIR}/cmake/SetTargetDefaults.cmake)
 
 add_library(soosh-native-server-lib
   server.cc
+  session.cc
 )
 
 set_target_defaults(soosh-native-server-lib)

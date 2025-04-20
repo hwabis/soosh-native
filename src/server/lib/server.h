@@ -1,7 +1,6 @@
 #pragma once
 
 #include <boost/asio.hpp>
-#include <string>
 
 namespace ip = boost::asio::ip;
 
@@ -13,11 +12,8 @@ public:
   void Start();
 
 private:
-  void startAccept();
-  void readMessage(std::shared_ptr<ip::tcp::socket> socket);
-  void sendMessage(std::shared_ptr<ip::tcp::socket> socket,
-                   const std::string &message);
-  void print(const std::string &message) const;
+  void accept();
+
   boost::asio::io_context ioContext_;
   ip::tcp::acceptor acceptor_;
 };
