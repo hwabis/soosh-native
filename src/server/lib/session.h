@@ -9,7 +9,7 @@ namespace soosh {
 
 class Session : public std::enable_shared_from_this<Session> {
 public:
-  explicit Session(ip::tcp::socket socket);
+  explicit Session(std::shared_ptr<ip::tcp::socket> socket);
   void Start();
 
 private:
@@ -17,7 +17,7 @@ private:
   void sendMessage(const std::string &message);
   void handleError(const boost::system::error_code &ec,
                    const std::string &context);
-  ip::tcp::socket socket_;
+  std::shared_ptr<ip::tcp::socket> socket_;
   boost::asio::steady_timer timer_;
   boost::asio::streambuf buffer_;
 };

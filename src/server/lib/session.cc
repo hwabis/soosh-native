@@ -3,8 +3,8 @@
 
 namespace soosh {
 
-Session::Session(ip::tcp::socket socket)
-    : socket_(std::move(socket)), timer_(socket_.get_executor()) {}
+Session::Session(std::shared_ptr<ip::tcp::socket> socket)
+    : socket_(std::move(socket)), timer_(socket_->get_executor()) {}
 
 void Session::Start() {
   std::cout << "[INFO] Client connected.\n";
@@ -15,7 +15,7 @@ void Session::Start() {
 void Session::readMessage() {
   auto self = shared_from_this();
   boost::asio::async_read_until(
-      socket_, buffer_, '\n',
+      *socket_, buffer_, '\n',
       [this, self](const boost::system::error_code &ec, std::size_t) {
         if (!ec) {
           std::istream input(&buffer_);
@@ -33,7 +33,7 @@ void Session::sendMessage(const std::string &message) {
   auto self = shared_from_this();
   auto buffer = std::make_shared<std::string>(message);
   boost::asio::async_write(
-      socket_, boost::asio::buffer(*buffer),
+      *socket_, boost::asio::buffer(*buffer),
       [this, self, buffer](const boost::system::error_code &ec, std::size_t) {
         if (!ec) {
           std::cout << "[INFO] Message sent to client.\n";
@@ -59,7 +59,7 @@ void Session::handleError(const boost::system::error_code &ec,
   }
 
   boost::system::error_code ignore;
-  socket_.close(ignore);
+  socket_->close(ignore);
 }
 
 } // namespace soosh
