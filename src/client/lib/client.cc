@@ -4,7 +4,7 @@
 
 namespace soosh {
 
-Client::Client(const std::string &serverAddress, unsigned short port)
+Client::Client(std::string serverAddress, unsigned short port)
     : ioContext_(), socket_(ioContext_),
       serverEndpoint_(ip::make_address(serverAddress), port) {}
 

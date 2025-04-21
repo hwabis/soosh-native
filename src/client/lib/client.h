@@ -9,7 +9,7 @@ namespace soosh {
 
 class Client {
 public:
-  Client(const std::string &serverAddress, unsigned short port);
+  Client(std::string serverAddress, unsigned short port);
   void Start();
 
 private:

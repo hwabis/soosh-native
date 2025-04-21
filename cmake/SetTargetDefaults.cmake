@@ -20,5 +20,5 @@ function(set_target_defaults target)
     )
     # todo: any way to enable include cleanup in visual studio from here?
   endif()
-  # todo: g++/clang, cppcheck automatically
+  # todo: g++/clang
 endfunction()

@@ -48,8 +48,7 @@ void Session::listen() {
       });
 }
 
-void Session::handleError(const boost::system::error_code &ec,
-                          const std::string &context) {
+void Session::handleError(boost::system::error_code ec, std::string context) {
   if (ec == boost::asio::error::eof ||
       ec == boost::asio::error::connection_reset) {
     std::cout << "[INFO] Client disconnected.\n";

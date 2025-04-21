@@ -7,7 +7,7 @@ Session::Session(ip::tcp::socket socket) : socket_(std::move(socket)) {}
 
 void Session::Start() { listen(); }
 
-void Session::SendMessage(const std::string &message) {
+void Session::SendMessage(std::string message) {
   auto self(shared_from_this());
   auto fullMessage = std::make_shared<std::string>(message + "\n");
   boost::asio::async_write(
@@ -37,7 +37,7 @@ void Session::listen() {
       });
 }
 
-void Session::handleReceiveError(const boost::system::error_code &ec) {
+void Session::handleReceiveError(boost::system::error_code ec) {
   if (ec == boost::asio::error::eof ||
       ec == boost::asio::error::connection_reset) {
     std::cout << "Server disconnected." << std::endl;
