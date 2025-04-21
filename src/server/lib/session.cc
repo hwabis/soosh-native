@@ -3,16 +3,32 @@
 
 namespace soosh {
 
-Session::Session(std::shared_ptr<ip::tcp::socket> socket)
-    : socket_(std::move(socket)), timer_(socket_->get_executor()) {}
+Session::Session(std::shared_ptr<ip::tcp::socket> socket,
+                 std::unique_ptr<GameMessageHandler> handler)
+    : socket_(std::move(socket)), handler_(std::move(handler)),
+      timer_(socket_->get_executor()) {}
 
 void Session::Start() {
   std::cout << "[INFO] Client connected.\n";
-  readMessage();
-  sendMessage("Hello from encapsulated server!\n");
+  listen();
+  SendMessage("Hello from encapsulated server!\n");
 }
 
-void Session::readMessage() {
+void Session::SendMessage(const std::string &message) {
+  auto self = shared_from_this();
+  auto buffer = std::make_shared<std::string>(message);
+  boost::asio::async_write(
+      *socket_, boost::asio::buffer(*buffer),
+      [this, self, buffer](const boost::system::error_code &ec, std::size_t) {
+        if (!ec) {
+          std::cout << "[INFO] Message sent to client.\n";
+        } else {
+          handleError(ec, "sending message");
+        }
+      });
+}
+
+void Session::listen() {
   auto self = shared_from_this();
   boost::asio::async_read_until(
       *socket_, buffer_, '\n',
@@ -22,29 +38,12 @@ void Session::readMessage() {
           std::string message;
           std::getline(input, message);
           std::cout << "[CLIENT] " << message << '\n';
-          readMessage();
+
+          handler_->OnMessageReceived(message, self);
+
+          listen();
         } else {
           handleError(ec, "receiving message");
-        }
-      });
-}
-
-void Session::sendMessage(const std::string &message) {
-  auto self = shared_from_this();
-  auto buffer = std::make_shared<std::string>(message);
-  boost::asio::async_write(
-      *socket_, boost::asio::buffer(*buffer),
-      [this, self, buffer](const boost::system::error_code &ec, std::size_t) {
-        if (!ec) {
-          std::cout << "[INFO] Message sent to client.\n";
-          timer_.expires_after(std::chrono::seconds(5));
-          timer_.async_wait([this, self](const boost::system::error_code &ec) {
-            if (!ec) {
-              sendMessage("Another message from the server after a delay.\n");
-            }
-          });
-        } else {
-          handleError(ec, "sending message");
         }
       });
 }

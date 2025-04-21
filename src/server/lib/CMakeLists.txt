@@ -3,6 +3,7 @@ include(${CMAKE_SOURCE_DIR}/cmake/SetTargetDefaults.cmake)
 add_library(soosh-native-server-lib
   server.cc
   session.cc
+  game_message_handler.cc
 )
 
 set_target_defaults(soosh-native-server-lib)
