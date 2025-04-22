@@ -17,7 +17,8 @@ public:
 
 private:
   void listen();
-  void handleError(boost::system::error_code ec, std::string context);
+  void handleError(const boost::system::error_code &ec,
+                   const std::string &context);
   std::shared_ptr<ip::tcp::socket> socket_;
   std::unique_ptr<GameMessageHandler> handler_;
   boost::asio::steady_timer timer_;
