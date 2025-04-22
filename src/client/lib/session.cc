@@ -12,8 +12,7 @@ void Session::SendMessage(const std::string &message) {
   auto fullMessage = std::make_shared<std::string>(message + "\n");
   boost::asio::async_write(
       socket_, boost::asio::buffer(*fullMessage),
-      [this, self, fullMessage](const boost::system::error_code &ec,
-                                std::size_t) {
+      [self](const boost::system::error_code &ec, std::size_t) {
         if (ec) {
           std::cerr << "Error sending message: " << ec.message() << std::endl;
         }

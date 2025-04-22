@@ -5,13 +5,13 @@
 namespace soosh {
 
 Client::Client(const std::string &serverAddress, unsigned short port)
-    : ioContext_(), socket_(ioContext_),
-      serverEndpoint_(ip::make_address(serverAddress), port) {}
+    : ioContext_(), serverEndpoint_(ip::make_address(serverAddress), port) {}
 
 void Client::Start() {
   try {
-    socket_.connect(serverEndpoint_);
-    if (!socket_.is_open()) {
+    ip::tcp::socket socket(ioContext_);
+    socket.connect(serverEndpoint_);
+    if (!socket.is_open()) {
       std::cerr << "Socket failed to open." << std::endl;
       return;
     }
@@ -21,7 +21,7 @@ void Client::Start() {
               << serverEndpoint_.port() << std::endl;
 
     std::shared_ptr<Session> session =
-        std::make_shared<Session>(std::move(socket_));
+        std::make_shared<Session>(std::move(socket));
     session->Start();
 
     std::jthread inputThread([session]() {

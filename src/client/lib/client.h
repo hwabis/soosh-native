@@ -14,7 +14,6 @@ public:
 
 private:
   boost::asio::io_context ioContext_;
-  ip::tcp::socket socket_;
   ip::tcp::endpoint serverEndpoint_;
 };
 

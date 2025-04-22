@@ -4,7 +4,7 @@
 namespace soosh {
 
 Session::Session(std::shared_ptr<ip::tcp::socket> socket,
-                 std::unique_ptr<GameMessageHandler> handler)
+                 GameMessageHandler handler)
     : socket_(std::move(socket)), handler_(std::move(handler)),
       timer_(socket_->get_executor()) {}
 
@@ -19,7 +19,7 @@ void Session::SendMessage(const std::string &message) {
   auto buffer = std::make_shared<std::string>(message);
   boost::asio::async_write(
       *socket_, boost::asio::buffer(*buffer),
-      [this, self, buffer](const boost::system::error_code &ec, std::size_t) {
+      [this, self](const boost::system::error_code &ec, std::size_t) {
         if (!ec) {
           std::cout << "[INFO] Message sent to client.\n";
         } else {
@@ -39,7 +39,7 @@ void Session::listen() {
           std::getline(input, message);
           std::cout << "[CLIENT] " << message << '\n';
 
-          handler_->OnMessageReceived(message, self);
+          handler_.OnMessageReceived(message, *self);
 
           listen();
         } else {

@@ -9,8 +9,7 @@ class Session;
 
 class GameMessageHandler {
 public:
-  void OnMessageReceived(const std::string &message,
-                         std::shared_ptr<Session> session);
+  void OnMessageReceived(const std::string &message, Session &session);
 };
 
 } // namespace soosh

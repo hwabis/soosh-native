@@ -20,8 +20,7 @@ void Server::accept() {
   acceptor_.async_accept(
       *socket, [this, socket](const boost::system::error_code &ec) {
         if (!ec) {
-          std::make_shared<Session>(std::move(socket),
-                                    std::make_unique<GameMessageHandler>())
+          std::make_shared<Session>(std::move(socket), GameMessageHandler())
               ->Start();
         } else {
           std::cerr << "[ERROR] Accept failed: " << ec.message() << '\n';
