@@ -1,6 +1,7 @@
 #pragma once
 
 #include "game_message_handler.h"
+#include "soosh.pb.h"
 #include <boost/asio.hpp>
 #include <string>
 
@@ -12,7 +13,7 @@ class Session : public std::enable_shared_from_this<Session> {
 public:
   Session(std::shared_ptr<ip::tcp::socket> socket, GameMessageHandler handler);
   void Start();
-  void SendMessage(const std::string &message);
+  void SendMessage(const soosh::ServerMessage &message);
 
 private:
   void listen();

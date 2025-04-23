@@ -11,40 +11,80 @@ Session::Session(std::shared_ptr<ip::tcp::socket> socket,
 void Session::Start() {
   std::cout << "[INFO] Client connected.\n";
   listen();
-  SendMessage("Hello from encapsulated server!\n");
+
+  soosh::ServerMessage msg;
+  msg.set_status("ok");
+  msg.set_data("Hello from encapsulated server!");
+  SendMessage(msg);
 }
 
-void Session::SendMessage(const std::string &message) {
+void Session::SendMessage(const soosh::ServerMessage &message) {
   auto self = shared_from_this();
-  auto buffer = std::make_shared<std::string>(message);
+
+  auto serialized = std::make_shared<std::string>();
+  if (!message.SerializeToString(serialized.get())) {
+    std::cerr << "Failed to serialize ServerMessage\n";
+    return;
+  }
+
+  uint32_t size = static_cast<uint32_t>(serialized->size());
+  auto sizeBuf = std::make_shared<std::array<char, 4>>();
+  std::memcpy(sizeBuf->data(), &size, 4);
+
+  std::vector<boost::asio::const_buffer> buffers = {
+      boost::asio::buffer(*sizeBuf), boost::asio::buffer(*serialized)};
+
   boost::asio::async_write(
-      *socket_, boost::asio::buffer(*buffer),
-      [this, self](const boost::system::error_code &ec, std::size_t) {
-        if (!ec) {
-          std::cout << "[INFO] Message sent to client.\n";
-        } else {
+      *socket_, buffers,
+      [this, self, sizeBuf, serialized](const boost::system::error_code &ec,
+                                        std::size_t) {
+        if (ec) {
           handleError(ec, "sending message");
+        } else {
+          std::cout << "[INFO] Message sent to client.\n";
         }
       });
 }
 
 void Session::listen() {
   auto self = shared_from_this();
-  boost::asio::async_read_until(
-      *socket_, buffer_, '\n',
-      [this, self](const boost::system::error_code &ec, std::size_t) {
-        if (!ec) {
-          std::istream input(&buffer_);
-          std::string message;
-          std::getline(input, message);
-          std::cout << "[CLIENT] " << message << '\n';
+  auto sizeBuf = std::make_shared<std::array<char, 4>>();
 
-          handler_.OnMessageReceived(message, *self);
-
-          listen();
-        } else {
-          handleError(ec, "receiving message");
+  boost::asio::async_read(
+      *socket_, boost::asio::buffer(*sizeBuf),
+      [this, self, sizeBuf](const boost::system::error_code &ec, std::size_t) {
+        if (ec) {
+          handleError(ec, "receiving size");
+          return;
         }
+
+        uint32_t msgSize;
+        std::memcpy(&msgSize, sizeBuf->data(), 4);
+
+        auto msgBuf = std::make_shared<std::vector<char>>(msgSize);
+        boost::asio::async_read(
+            *socket_, boost::asio::buffer(*msgBuf),
+            [this, self, msgBuf](const boost::system::error_code &ec,
+                                 std::size_t) {
+              if (ec) {
+                handleError(ec, "receiving message body");
+                return;
+              }
+
+              soosh::ClientMessage msg;
+              if (!msg.ParseFromArray(msgBuf->data(),
+                                      static_cast<int>(msgBuf->size()))) {
+                std::cerr << "Failed to parse ClientMessage\n";
+                return;
+              }
+
+              std::cout << "[CLIENT ACTION] " << msg.action()
+                        << ", payload: " << msg.payload() << '\n';
+
+              handler_.OnMessageReceived(msg, *self);
+
+              listen();
+            });
       });
 }
 

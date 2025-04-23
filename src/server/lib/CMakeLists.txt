@@ -14,4 +14,5 @@ target_include_directories(soosh-native-server-lib PUBLIC
 
 target_link_libraries(soosh-native-server-lib PRIVATE
   Boost::asio
+  soosh-proto
 )

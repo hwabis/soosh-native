@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package soosh;
+
+message ClientMessage {
+  string action = 1;
+  string payload = 2;
+}
+
+message ServerMessage {
+  string status = 1;
+  string data = 2;
+}

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "soosh.pb.h"
 #include <memory>
 #include <string>
 
@@ -9,7 +10,7 @@ class Session;
 
 class GameMessageHandler {
 public:
-  void OnMessageReceived(const std::string &message, Session &session);
+  void OnMessageReceived(const soosh::ClientMessage &message, Session &session);
 };
 
 } // namespace soosh

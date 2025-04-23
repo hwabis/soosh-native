@@ -4,10 +4,10 @@
 
 namespace soosh {
 
-void GameMessageHandler::OnMessageReceived(const std::string &message,
+void GameMessageHandler::OnMessageReceived(const soosh::ClientMessage &message,
                                            Session &session) {
-  std::cout << "[GAME LOGIC] Processing message: " << message << '\n';
-  session.SendMessage("Game Logic Acknowledged: " + message + "\n");
+  std::cout << "[GAME LOGIC] " << message.action()
+            << ", payload: " << message.payload() << '\n';
 }
 
 } // namespace soosh

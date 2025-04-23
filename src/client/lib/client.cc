@@ -35,7 +35,10 @@ void Client::Start() {
           break;
         }
 
-        session->SendMessage(userInput);
+        soosh::ClientMessage msg;
+        msg.set_action("join");
+        msg.set_payload(userInput);
+        session->SendMessage(msg);
       }
     });
 

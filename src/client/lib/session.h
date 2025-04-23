@@ -1,5 +1,6 @@
 #pragma once
 
+#include "soosh.pb.h"
 #include <boost/asio.hpp>
 #include <string>
 
@@ -11,7 +12,7 @@ class Session : public std::enable_shared_from_this<Session> {
 public:
   explicit Session(ip::tcp::socket socket);
   void Start();
-  void SendMessage(const std::string &message);
+  void SendMessage(const soosh::ClientMessage &message);
 
 private:
   void listen();
