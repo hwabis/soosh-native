@@ -20,29 +20,27 @@ void Client::Start() {
               << serverEndpoint_.address().to_string() << ":"
               << serverEndpoint_.port() << std::endl;
 
-    std::shared_ptr<Session> session =
-        std::make_shared<Session>(std::move(socket));
+    auto session = std::make_shared<Session>(std::move(socket));
     session->Start();
 
-    std::jthread inputThread([session]() {
-      std::string userInput;
-      while (true) {
-        std::cout << "> ";
-        std::getline(std::cin, userInput);
+    std::jthread ioThread([&] { ioContext_.run(); });
 
-        if (userInput == "quit") {
-          std::cout << "Exiting client..." << std::endl;
-          break;
-        }
+    std::string userInput;
+    while (true) {
+      std::cout << "> ";
+      std::getline(std::cin, userInput);
 
-        soosh::ClientMessage msg;
-        msg.set_action("join");
-        msg.set_payload(userInput);
-        session->SendMessage(msg);
+      if (userInput == "quit") {
+        std::cout << "Exiting client..." << std::endl;
+        ioContext_.stop();
+        break;
       }
-    });
 
-    ioContext_.run();
+      soosh::ClientMessage msg;
+      msg.set_action("join");
+      msg.set_payload(userInput);
+      session->SendMessage(msg);
+    }
   } catch (const boost::system::system_error &e) {
     std::cerr << "Connection failed: " << e.what() << std::endl;
   }
