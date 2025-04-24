@@ -5,7 +5,10 @@ project(
   LANGUAGES CXX
 )
 
-include(cmake/dependencies.cmake)
+find_package(CLI11 2.5 CONFIG REQUIRED)
+find_package(Boost 1.88 REQUIRED COMPONENTS asio)
+find_package(Protobuf 5.29 CONFIG REQUIRED)
+find_package(gtest 1.16 CONFIG REQUIRED)
 
 add_subdirectory(src)
 add_subdirectory(tests)
