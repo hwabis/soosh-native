@@ -1,18 +1,18 @@
 include(${CMAKE_SOURCE_DIR}/cmake/SetTargetDefaults.cmake)
 
-add_library(soosh-native-server-lib
+add_library(soosh-server-lib
   server.cc
   session.cc
   game_message_handler.cc
 )
 
-set_target_defaults(soosh-native-server-lib)
+set_target_defaults(soosh-server-lib)
 
-target_include_directories(soosh-native-server-lib PUBLIC
+target_include_directories(soosh-server-lib PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_link_libraries(soosh-native-server-lib PRIVATE
+target_link_libraries(soosh-server-lib PRIVATE
   Boost::asio
   soosh-proto
 )
