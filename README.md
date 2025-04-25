@@ -15,7 +15,7 @@
    ```
 1. Open the `.sln` in Visual Studio 2022 and run a target (or `cmake --build .` then run the executables).
 
-Visual Studio 2022 has built-in `clang-tidy` support, but there's no way (that I know of) to cleanly aggregate all the results.
+Visual Studio 2022 has built-in `clang-tidy` support, but there's no way (that I know of) to cleanly aggregate all the results. (Also note that the code is not fully `clang-tidy` compliant).
 The recommended method is using WSL2 and something like:
    ```bash
    cmake .. -G Ninja -DCMAKE_TOOLCHAIN_FILE=~/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON

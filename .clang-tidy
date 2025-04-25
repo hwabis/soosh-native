@@ -9,3 +9,5 @@ Checks: >
   portability-*,
   readability-*,
   clang-analyzer-*,
+
+HeaderFilterRegex: '^src/.*'

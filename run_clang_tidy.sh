@@ -15,7 +15,7 @@ fi
 
 echo "Running clang-tidy using compile_commands.json from '$BUILD_DIR'..."
 
-find ./src -type f -name '*.cc' | while read -r file; do
+find ./src \( -name '*.cc' -o -name '*.h' \) | while read -r file; do
     echo "👉 Checking $file"
     clang-tidy "$file" -p "$BUILD_DIR"
 done
