@@ -18,6 +18,10 @@
 Visual Studio 2022 has built-in `clang-tidy` support, but there's no way (that I know of) to cleanly aggregate all the results.
 The recommended method is using WSL2 and something like:
    ```bash
+   mkdir build-wsl
+   cd build-wsl
    cmake .. -G Ninja -DCMAKE_TOOLCHAIN_FILE=~/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-   run_clang_tidy.sh
+   cmake --build .
+   cd ..
+   ./run_clang_tidy.sh
    ```
