@@ -1,6 +1,7 @@
 #include "client.h"
 #include "session.h"
 #include <iostream>
+#include <thread>
 
 namespace soosh {
 

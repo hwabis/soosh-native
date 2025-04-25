@@ -16,9 +16,8 @@ function(set_target_defaults target)
       /wd26440 # Do not litter noexcept everywhere
       # microsoft plzzz :((( https://developercommunity.visualstudio.com/t/Enabling-Address-Sanitizer-results-in-er/10053975
       # /fsanitize=address
-      # /Zi
     )
     # todo: any way to enable include cleanup in visual studio from here?
   endif()
-  # todo: g++/clang, cppcheck automatically
+  # todo: g++/clang
 endfunction()
