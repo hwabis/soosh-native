@@ -1,5 +1,5 @@
 #include "client.h"
-#include "session.h"
+#include "client_session.h"
 #include "soosh.pb.h"
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/address.hpp>
@@ -29,7 +29,7 @@ void Client::Start() {
               << serverEndpoint_.address().to_string() << ":"
               << serverEndpoint_.port() << "\n";
 
-    auto session = std::make_shared<Session>(std::move(socket));
+    auto session = std::make_shared<ClientSession>(std::move(socket));
     session->Start();
 
     const std::jthread ioThread([&] { ioContext_.run(); });

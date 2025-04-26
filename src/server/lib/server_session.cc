@@ -1,15 +1,16 @@
-#include "session.h"
 #include "protobuf_stream_utils.h"
+#include "server_session.h"
 #include <iostream>
+
 
 namespace soosh {
 
-Session::Session(std::shared_ptr<ip::tcp::socket> socket,
-                 GameMessageHandler handler)
+ServerSession::ServerSession(std::shared_ptr<ip::tcp::socket> socket,
+                             GameMessageHandler handler)
     : socket_(std::move(socket)), handler_(std::move(handler)),
       timer_(socket_->get_executor()) {}
 
-void Session::Start() {
+void ServerSession::Start() {
   std::cout << "[INFO] Client connected.\n";
   listen();
 
@@ -19,7 +20,7 @@ void Session::Start() {
   SendMessage(msg);
 }
 
-void Session::SendMessage(const soosh::ServerMessage &message) {
+void ServerSession::SendMessage(const soosh::ServerMessage &message) {
   auto self = shared_from_this();
 
   soosh::AsyncWriteProtobuf(
@@ -30,7 +31,7 @@ void Session::SendMessage(const soosh::ServerMessage &message) {
       });
 }
 
-void Session::listen() {
+void ServerSession::listen() {
   auto self = shared_from_this();
 
   soosh::AsyncReadProtobuf<soosh::ClientMessage>(
@@ -55,8 +56,8 @@ void Session::listen() {
       });
 }
 
-void Session::handleError(const boost::system::error_code &ec,
-                          const std::string &context) {
+void ServerSession::handleError(const boost::system::error_code &ec,
+                                const std::string &context) {
   if (ec == boost::asio::error::eof ||
       ec == boost::asio::error::connection_reset) {
     std::cout << "[INFO] Client disconnected.\n";

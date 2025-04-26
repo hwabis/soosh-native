@@ -8,9 +8,9 @@ namespace ip = boost::asio::ip;
 
 namespace soosh {
 
-class Session : public std::enable_shared_from_this<Session> {
+class ClientSession : public std::enable_shared_from_this<ClientSession> {
 public:
-  explicit Session(ip::tcp::socket socket);
+  explicit ClientSession(ip::tcp::socket socket);
   void Start();
   void SendMessage(const soosh::ClientMessage &message);
 

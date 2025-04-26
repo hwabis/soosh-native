@@ -1,14 +1,15 @@
-#include "session.h"
+#include "client_session.h"
 #include "protobuf_stream_utils.h"
 #include <iostream>
 
 namespace soosh {
 
-Session::Session(ip::tcp::socket socket) : socket_(std::move(socket)) {}
+ClientSession::ClientSession(ip::tcp::socket socket)
+    : socket_(std::move(socket)) {}
 
-void Session::Start() { listen(); }
+void ClientSession::Start() { listen(); }
 
-void Session::SendMessage(const soosh::ClientMessage &message) {
+void ClientSession::SendMessage(const soosh::ClientMessage &message) {
   auto self = shared_from_this();
 
   soosh::AsyncWriteProtobuf(
@@ -19,7 +20,7 @@ void Session::SendMessage(const soosh::ClientMessage &message) {
       });
 }
 
-void Session::listen() {
+void ClientSession::listen() {
   auto self = shared_from_this();
 
   soosh::AsyncReadProtobuf<soosh::ServerMessage>(
@@ -40,7 +41,7 @@ void Session::listen() {
       });
 }
 
-void Session::handleReceiveError(const boost::system::error_code &ec) {
+void ClientSession::handleReceiveError(const boost::system::error_code &ec) {
   if (ec == boost::asio::error::eof ||
       ec == boost::asio::error::connection_reset) {
     std::cout << "Server disconnected." << std::endl;

@@ -6,11 +6,12 @@
 
 namespace soosh {
 
-class Session;
+class ServerSession;
 
 class GameMessageHandler {
 public:
-  void OnMessageReceived(const soosh::ClientMessage &message, Session &session);
+  void OnMessageReceived(const soosh::ClientMessage &message,
+                         ServerSession &session);
 };
 
 } // namespace soosh
