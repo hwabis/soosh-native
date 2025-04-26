@@ -1,4 +1,5 @@
 #include "session.h"
+#include "protobuf_stream_utils.h"
 #include <iostream>
 
 namespace soosh {
@@ -10,23 +11,8 @@ void Session::Start() { listen(); }
 void Session::SendMessage(const soosh::ClientMessage &message) {
   auto self = shared_from_this();
 
-  auto serialized = std::make_shared<std::string>();
-  if (!message.SerializeToString(serialized.get())) {
-    std::cerr << "Failed to serialize ClientMessage\n";
-    return;
-  }
-
-  uint32_t size = static_cast<uint32_t>(serialized->size());
-  auto sizeBuf = std::make_shared<std::array<char, 4>>();
-  std::memcpy(sizeBuf->data(), &size, 4);
-
-  std::vector<boost::asio::const_buffer> buffers = {
-      boost::asio::buffer(*sizeBuf), boost::asio::buffer(*serialized)};
-
-  boost::asio::async_write(
-      socket_, buffers,
-      [self, sizeBuf, serialized](const boost::system::error_code &ec,
-                                  std::size_t) {
+  soosh::AsyncWriteProtobuf(
+      socket_, message, [self](const boost::system::error_code &ec) {
         if (ec) {
           std::cerr << "Error sending message: " << ec.message() << '\n';
         }
@@ -35,41 +21,22 @@ void Session::SendMessage(const soosh::ClientMessage &message) {
 
 void Session::listen() {
   auto self = shared_from_this();
-  auto sizeBuf = std::make_shared<std::array<char, 4>>();
 
-  boost::asio::async_read(
-      socket_, boost::asio::buffer(*sizeBuf),
-      [this, self, sizeBuf](const boost::system::error_code &ec, std::size_t) {
+  soosh::AsyncReadProtobuf<soosh::ServerMessage>(
+      socket_, [this, self](const boost::system::error_code &ec,
+                            std::shared_ptr<soosh::ServerMessage> msg) {
         if (ec) {
           handleReceiveError(ec);
           return;
         }
 
-        uint32_t msgSize;
-        std::memcpy(&msgSize, sizeBuf->data(), 4);
-
-        auto msgBuf = std::make_shared<std::vector<char>>(msgSize);
-        boost::asio::async_read(
-            socket_, boost::asio::buffer(*msgBuf),
-            [this, self, msgBuf](const boost::system::error_code &ec,
-                                 std::size_t) {
-              if (ec) {
-                handleReceiveError(ec);
-                return;
-              }
-
-              soosh::ServerMessage msg;
-              if (!msg.ParseFromArray(msgBuf->data(),
-                                      static_cast<int>(msgBuf->size()))) {
-                std::cerr << "Failed to parse ServerMessage\n";
-                return;
-              }
-
-              std::cout << "Server status: " << msg.status()
-                        << ", data: " << msg.data() << '\n';
-
-              listen();
-            });
+        if (msg) {
+          std::cout << "Server status: " << msg->status()
+                    << ", data: " << msg->data() << '\n';
+          listen();
+        } else {
+          handleReceiveError(boost::asio::error::operation_aborted);
+        }
       });
 }
 

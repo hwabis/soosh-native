@@ -1,4 +1,5 @@
 #include "session.h"
+#include "protobuf_stream_utils.h"
 #include <iostream>
 
 namespace soosh {
@@ -21,70 +22,36 @@ void Session::Start() {
 void Session::SendMessage(const soosh::ServerMessage &message) {
   auto self = shared_from_this();
 
-  auto serialized = std::make_shared<std::string>();
-  if (!message.SerializeToString(serialized.get())) {
-    std::cerr << "Failed to serialize ServerMessage\n";
-    return;
-  }
-
-  uint32_t size = static_cast<uint32_t>(serialized->size());
-  auto sizeBuf = std::make_shared<std::array<char, 4>>();
-  std::memcpy(sizeBuf->data(), &size, 4);
-
-  std::vector<boost::asio::const_buffer> buffers = {
-      boost::asio::buffer(*sizeBuf), boost::asio::buffer(*serialized)};
-
-  boost::asio::async_write(
-      *socket_, buffers,
-      [this, self, sizeBuf, serialized](const boost::system::error_code &ec,
-                                        std::size_t) {
+  soosh::AsyncWriteProtobuf(
+      *socket_, message, [self](const boost::system::error_code &ec) {
         if (ec) {
-          handleError(ec, "sending message");
-        } else {
-          std::cout << "[INFO] Message sent to client.\n";
+          std::cerr << "Error sending message: " << ec.message() << '\n';
         }
       });
 }
 
 void Session::listen() {
   auto self = shared_from_this();
-  auto sizeBuf = std::make_shared<std::array<char, 4>>();
 
-  boost::asio::async_read(
-      *socket_, boost::asio::buffer(*sizeBuf),
-      [this, self, sizeBuf](const boost::system::error_code &ec, std::size_t) {
+  soosh::AsyncReadProtobuf<soosh::ClientMessage>(
+      *socket_, [this, self](const boost::system::error_code &ec,
+                             std::shared_ptr<soosh::ClientMessage> msg) {
         if (ec) {
-          handleError(ec, "receiving size");
+          handleError(ec, "receiving message");
           return;
         }
 
-        uint32_t msgSize;
-        std::memcpy(&msgSize, sizeBuf->data(), 4);
+        if (msg) {
+          std::cout << "[CLIENT ACTION] " << msg->action()
+                    << ", payload: " << msg->payload() << '\n';
 
-        auto msgBuf = std::make_shared<std::vector<char>>(msgSize);
-        boost::asio::async_read(
-            *socket_, boost::asio::buffer(*msgBuf),
-            [this, self, msgBuf](const boost::system::error_code &ec,
-                                 std::size_t) {
-              if (ec) {
-                handleError(ec, "receiving message body");
-                return;
-              }
+          handler_.OnMessageReceived(*msg, *self);
 
-              soosh::ClientMessage msg;
-              if (!msg.ParseFromArray(msgBuf->data(),
-                                      static_cast<int>(msgBuf->size()))) {
-                std::cerr << "Failed to parse ClientMessage\n";
-                return;
-              }
-
-              std::cout << "[CLIENT ACTION] " << msg.action()
-                        << ", payload: " << msg.payload() << '\n';
-
-              handler_.OnMessageReceived(msg, *self);
-
-              listen();
-            });
+          listen();
+        } else {
+          handleError(boost::asio::error::operation_aborted,
+                      "null message received");
+        }
       });
 }
 
