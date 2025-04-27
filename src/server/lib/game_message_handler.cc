@@ -7,34 +7,14 @@ GameMessageHandler::GameMessageHandler() : gameSession_() {}
 
 void GameMessageHandler::OnMessageReceived(const soosh::ClientMessage &message,
                                            ServerSession &session) {
-  const std::string &action = message.action();
+  const auto action = message.action();
   const std::string &payload = message.payload();
-
-  if (action == "join") {
-    if (payload.empty()) {
-      ServerMessage errorMsg;
-      errorMsg.set_status("error");
-      errorMsg.set_data("Player name cannot be empty.");
-      session.SendMessage(errorMsg);
-      return;
-    }
-    if (!session.GetPlayerName().empty()) {
-      ServerMessage errorMsg;
-      errorMsg.set_status("error");
-      errorMsg.set_data("Already joined.");
-      session.SendMessage(errorMsg);
-      return;
-    }
-    if (!gameSession_.AddPlayer(payload)) {
-      ServerMessage errorMsg;
-      errorMsg.set_status("error");
-      errorMsg.set_data("Failed to join. Name may already exist.");
-      session.SendMessage(errorMsg);
-      return;
-    }
-
-    session.SetPlayerName(payload);
-  } else if (action == "start") {
+  switch (action) {
+  case soosh::ActionType::JOIN: {
+    gameSession_.AddPlayer(payload);
+    break;
+  }
+  case soosh::ActionType::START: {
     std::string error;
     if (!gameSession_.StartGame(error)) {
       ServerMessage errorMsg;
@@ -43,36 +23,35 @@ void GameMessageHandler::OnMessageReceived(const soosh::ClientMessage &message,
       session.SendMessage(errorMsg);
       return;
     }
-  } else if (action == "play") {
+    break;
+  }
+  case soosh::ActionType::PLAY: {
+    // Expected format: "index1 index2"
     int idx1 = -1, idx2 = -1;
+
 #pragma warning(push)
 #pragma warning(disable : 4996)
     int numScanned = sscanf(payload.c_str(), "%d %d", &idx1, &idx2);
     (void)numScanned;
 #pragma warning(pop)
 
-    if (session.GetPlayerName().empty()) {
-      ServerMessage errorMsg;
-      errorMsg.set_status("error");
-      errorMsg.set_data("Must join a game first.");
-      session.SendMessage(errorMsg);
-      return;
-    }
-
+    const std::string &playerName = session.GetPlayerName();
     std::string error;
-    if (!gameSession_.PlayCard(session.GetPlayerName(), idx1, idx2, error)) {
+    if (!gameSession_.PlayCard(playerName, idx1, idx2, error)) {
       ServerMessage errorMsg;
       errorMsg.set_status("error");
       errorMsg.set_data(error);
       session.SendMessage(errorMsg);
       return;
     }
-  } else {
+  }
+  default: {
     ServerMessage errorMsg;
     errorMsg.set_status("error");
     errorMsg.set_data("Unknown action: " + action);
     session.SendMessage(errorMsg);
     return;
+  }
   }
 
   ServerMessage stateMsg;

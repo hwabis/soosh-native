@@ -2,8 +2,15 @@ syntax = "proto3";
 
 package soosh;
 
+enum ActionType {
+  UNKNOWN = 0;
+  JOIN = 1;
+  START = 2;
+  PLAY = 3;
+}
+
 message ClientMessage {
-  string action = 1;
+  ActionType action = 1;
   string payload = 2;
 }
 

@@ -38,7 +38,7 @@ void Client::Start() {
     std::string playerName;
     std::getline(std::cin, playerName);
     soosh::ClientMessage joinMsg;
-    joinMsg.set_action("join");
+    joinMsg.set_action(soosh::ActionType::JOIN);
     joinMsg.set_payload(playerName);
     session->SendMessage(joinMsg);
 
@@ -57,14 +57,17 @@ void Client::Start() {
         break;
       }
 
-      auto spacePos = userInput.find(' ');
-      std::string action = userInput.substr(0, spacePos);
-      std::string payload =
-          (spacePos == std::string::npos) ? "" : userInput.substr(spacePos + 1);
-
       soosh::ClientMessage msg;
-      msg.set_action(action);
-      msg.set_payload(payload);
+      if (userInput == "start") {
+        msg.set_action(soosh::ActionType::START);
+        msg.set_payload("");
+      } else if (userInput.starts_with("play ")) {
+        msg.set_action(soosh::ActionType::PLAY);
+        msg.set_payload(userInput.substr(5));
+      } else {
+        std::cerr << "Unknown command.\n";
+        continue;
+      }
       session->SendMessage(msg);
     }
   } catch (const boost::system::system_error &e) {
