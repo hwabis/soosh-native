@@ -1,5 +1,7 @@
 ## Developing on Windows
 
+The code should be cross-platform but has only been tested on Windows.
+
 1. Ensure you have:
    - Visual Studio 2022 (or Visual Studio Build Tools)
    - CMake
@@ -15,7 +17,7 @@
    ```
 1. Open the `.sln` in Visual Studio 2022 and run a target (or `cmake --build .` then run the executables).
 
-Visual Studio 2022 has built-in `clang-tidy` support, but there's no way (that I know of) to cleanly aggregate all the results. (Also note `clang-tidy` compliance is low priority. `.clang-tidy` is there just for the heck of it.)
+Visual Studio 2022 has built-in `clang-tidy` support, but there's no way (that I know of) to cleanly aggregate all the results. (Also note `clang-tidy` compliance is low priority.)
 The recommended method is using WSL2 and something like:
    ```bash
    mkdir build-wsl

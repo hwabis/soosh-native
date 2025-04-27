@@ -1,7 +1,6 @@
+#include "networking/server_session.h"
 #include "protobuf_stream_utils.h"
-#include "server_session.h"
 #include <iostream>
-
 
 namespace soosh {
 

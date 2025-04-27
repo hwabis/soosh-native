@@ -1,4 +1,4 @@
-#include "server.h"
+#include "networking/server.h"
 #include <CLI/CLI.hpp>
 
 int main(int argc, char **argv) {
