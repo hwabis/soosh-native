@@ -11,7 +11,29 @@ void GameMessageHandler::OnMessageReceived(const soosh::ClientMessage &message,
   const std::string &payload = message.payload();
 
   if (action == "join") {
-    gameSession_.AddPlayer(payload);
+    if (payload.empty()) {
+      ServerMessage errorMsg;
+      errorMsg.set_status("error");
+      errorMsg.set_data("Player name cannot be empty.");
+      session.SendMessage(errorMsg);
+      return;
+    }
+    if (!session.GetPlayerName().empty()) {
+      ServerMessage errorMsg;
+      errorMsg.set_status("error");
+      errorMsg.set_data("Already joined.");
+      session.SendMessage(errorMsg);
+      return;
+    }
+    if (!gameSession_.AddPlayer(payload)) {
+      ServerMessage errorMsg;
+      errorMsg.set_status("error");
+      errorMsg.set_data("Failed to join. Name may already exist.");
+      session.SendMessage(errorMsg);
+      return;
+    }
+
+    session.SetPlayerName(payload);
   } else if (action == "start") {
     std::string error;
     if (!gameSession_.StartGame(error)) {
@@ -22,19 +44,23 @@ void GameMessageHandler::OnMessageReceived(const soosh::ClientMessage &message,
       return;
     }
   } else if (action == "play") {
-    // Expected format: "index1 index2"
     int idx1 = -1, idx2 = -1;
-
 #pragma warning(push)
 #pragma warning(disable : 4996)
     int numScanned = sscanf(payload.c_str(), "%d %d", &idx1, &idx2);
     (void)numScanned;
 #pragma warning(pop)
 
-    std::string playerName = "TODO";
+    if (session.GetPlayerName().empty()) {
+      ServerMessage errorMsg;
+      errorMsg.set_status("error");
+      errorMsg.set_data("Must join a game first.");
+      session.SendMessage(errorMsg);
+      return;
+    }
 
     std::string error;
-    if (!gameSession_.PlayCard(playerName, idx1, idx2, error)) {
+    if (!gameSession_.PlayCard(session.GetPlayerName(), idx1, idx2, error)) {
       ServerMessage errorMsg;
       errorMsg.set_status("error");
       errorMsg.set_data(error);

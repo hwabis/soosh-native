@@ -16,6 +16,9 @@ public:
   void Start();
   void SendMessage(const soosh::ServerMessage &message);
 
+  void SetPlayerName(const std::string &name) { playerName_ = name; }
+  const std::string &GetPlayerName() const { return playerName_; }
+
 private:
   void listen();
   void handleError(const boost::system::error_code &ec,
@@ -24,6 +27,7 @@ private:
   GameMessageHandler handler_;
   boost::asio::steady_timer timer_;
   boost::asio::streambuf buffer_;
+  std::string playerName_;
 };
 
 } // namespace soosh

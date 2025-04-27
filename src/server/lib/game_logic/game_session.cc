@@ -11,6 +11,10 @@ GameSession::GameSession()
 bool GameSession::AddPlayer(const std::string &playerName) {
   if (gameStage_ != GameStage::Waiting)
     return false;
+  for (const auto &player : players_) {
+    if (player.GetName() == playerName)
+      return false;
+  }
   players_.emplace_back(playerName);
   return true;
 }

@@ -34,9 +34,21 @@ void Client::Start() {
 
     const std::jthread ioThread([&] { ioContext_.run(); });
 
+    std::cout << "Enter your player name: ";
+    std::string playerName;
+    std::getline(std::cin, playerName);
+    soosh::ClientMessage joinMsg;
+    joinMsg.set_action("join");
+    joinMsg.set_payload(playerName);
+    session->SendMessage(joinMsg);
+
+    std::cout << "Available commands:\n";
+    std::cout << "  start\n";
+    std::cout << "  play <index1> <index2>\n";
+    std::cout << "  quit\n\n";
+
     std::string userInput;
     while (true) {
-      std::cout << "> ";
       std::getline(std::cin, userInput);
 
       if (userInput == "quit") {
