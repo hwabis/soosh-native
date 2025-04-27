@@ -78,7 +78,7 @@ void GameSession::resetRound() {
 }
 
 void GameSession::distributeCards() {
-  int cardsPerPlayer = 10 - players_.size();
+  auto cardsPerPlayer = 10 - players_.size();
   for (auto &player : players_) {
     for (int i = 0; i < cardsPerPlayer; ++i) {
       if (!deck_.empty()) {
@@ -93,7 +93,7 @@ void GameSession::rotateHands() {
   if (players_.size() < 2)
     return;
   auto lastHand = players_.back().GetHand();
-  for (int i = players_.size() - 1; i > 0; --i) {
+  for (auto i = players_.size() - 1; i > 0; --i) {
     players_[i].GetHand() = players_[i - 1].GetHand();
   }
   players_[0].GetHand() = lastHand;

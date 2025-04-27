@@ -45,9 +45,14 @@ void Client::Start() {
         break;
       }
 
+      auto spacePos = userInput.find(' ');
+      std::string action = userInput.substr(0, spacePos);
+      std::string payload =
+          (spacePos == std::string::npos) ? "" : userInput.substr(spacePos + 1);
+
       soosh::ClientMessage msg;
-      msg.set_action("join");
-      msg.set_payload(userInput);
+      msg.set_action(action);
+      msg.set_payload(payload);
       session->SendMessage(msg);
     }
   } catch (const boost::system::system_error &e) {
