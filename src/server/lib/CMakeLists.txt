@@ -11,6 +11,7 @@ set_target_defaults(soosh-server-lib)
 
 target_include_directories(soosh-server-lib PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
+  $<TARGET_PROPERTY:soosh-proto,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
 target_link_libraries(soosh-server-lib PRIVATE

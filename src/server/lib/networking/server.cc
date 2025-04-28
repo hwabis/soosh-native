@@ -7,7 +7,8 @@ namespace soosh {
 
 Server::Server(unsigned short port)
     : ioContext_(),
-      acceptor_(ioContext_, ip::tcp::endpoint(ip::tcp::v4(), port)) {}
+      acceptor_(ioContext_, ip::tcp::endpoint(ip::tcp::v4(), port)),
+      gameMessageHandler_(std::make_shared<GameMessageHandler>()) {}
 
 void Server::Start() {
   std::cout << "[INFO] Server started.\n";
@@ -20,7 +21,7 @@ void Server::accept() {
   acceptor_.async_accept(*socket, [this, socket](
                                       const boost::system::error_code &ec) {
     if (!ec) {
-      std::make_shared<ServerSession>(std::move(socket), GameMessageHandler())
+      std::make_shared<ServerSession>(std::move(socket), gameMessageHandler_)
           ->Start();
     } else {
       std::cerr << "[ERROR] Accept failed: " << ec.message() << '\n';

@@ -16,7 +16,7 @@ public:
                          ServerSession &session);
 
 private:
-  GameSession gameSession_;
+  soosh::GameSession gameSession_;
 };
 
 } // namespace soosh

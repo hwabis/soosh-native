@@ -5,7 +5,7 @@
 namespace soosh {
 
 ServerSession::ServerSession(std::shared_ptr<ip::tcp::socket> socket,
-                             GameMessageHandler handler)
+                             std::shared_ptr<GameMessageHandler> handler)
     : socket_(std::move(socket)), handler_(std::move(handler)),
       timer_(socket_->get_executor()) {}
 
@@ -42,10 +42,10 @@ void ServerSession::listen() {
         }
 
         if (msg) {
-          std::cout << "[CLIENT ACTION] " << msg->action()
+          std::cout << playerName_ << " ACTION: " << msg->action()
                     << ", payload: " << msg->payload() << '\n';
 
-          handler_.OnMessageReceived(*msg, *self);
+          handler_->OnMessageReceived(*msg, *self);
 
           listen();
         } else {

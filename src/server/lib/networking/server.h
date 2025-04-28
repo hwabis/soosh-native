@@ -1,5 +1,6 @@
 #pragma once
 
+#include "game_message_handler.h"
 #include <boost/asio.hpp>
 
 namespace ip = boost::asio::ip;
@@ -14,6 +15,7 @@ public:
 private:
   void accept();
 
+  std::shared_ptr<soosh::GameMessageHandler> gameMessageHandler_;
   boost::asio::io_context ioContext_;
   ip::tcp::acceptor acceptor_;
 };
