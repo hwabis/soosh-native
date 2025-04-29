@@ -5,7 +5,7 @@
 namespace soosh {
 
 ServerSession::ServerSession(std::shared_ptr<ip::tcp::socket> socket,
-                             std::shared_ptr<GameMessageHandler> handler)
+                             std::shared_ptr<IMessageHandler> handler)
     : socket_(std::move(socket)), handler_(std::move(handler)),
       timer_(socket_->get_executor()) {}
 

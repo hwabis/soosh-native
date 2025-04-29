@@ -1,4 +1,4 @@
-#include "game_message_handler.h"
+#include "handlers/game_message_handler.h"
 #include "networking/server_session.h"
 
 namespace soosh {
