@@ -5,6 +5,7 @@ add_library(soosh-server-lib
   handlers/game_message_handler.cc
   networking/server_session.cc
   networking/server.cc
+  utils/logger.cc
 )
 
 set_target_defaults(soosh-server-lib)

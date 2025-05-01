@@ -1,8 +1,8 @@
 #include "networking/server.h"
 #include "handlers/game_message_handler.h"
 #include "networking/server_session.h"
+#include "utils/logger.h"
 #include <boost/asio.hpp>
-#include <iostream>
 
 namespace soosh {
 
@@ -14,7 +14,7 @@ Server::Server(unsigned short port)
       ) {}
 
 void Server::Start() {
-  std::cout << "[INFO] Server started.\n";
+  Logger::Log("Server started.");
   accept();
   ioContext_.run();
 }
@@ -27,7 +27,7 @@ void Server::accept() {
           std::make_shared<ServerSession>(std::move(socket), messageHandler_)
               ->Start();
         } else {
-          std::cerr << "[ERROR] Accept failed: " << ec.message() << '\n';
+          Logger::Log("Accept failed: " + ec.message(), Logger::Level::Error);
         }
 
         accept();

@@ -1,6 +1,6 @@
 #include "networking/server_session.h"
 #include "protobuf_stream_utils.h"
-#include <iostream>
+#include "utils/logger.h"
 
 namespace soosh {
 
@@ -10,7 +10,7 @@ ServerSession::ServerSession(std::shared_ptr<ip::tcp::socket> socket,
       timer_(socket_->get_executor()) {}
 
 void ServerSession::Start() {
-  std::cout << "[INFO] Client connected.\n";
+  Logger::Log("Client connected.");
   listen();
 
   soosh::ServerMessage msg;
@@ -25,7 +25,8 @@ void ServerSession::SendMessage(const soosh::ServerMessage &message) {
   soosh::AsyncWriteProtobuf(
       *socket_, message, [self](const boost::system::error_code &ec) {
         if (ec) {
-          std::cerr << "Error sending message: " << ec.message() << '\n';
+          Logger::Log("Error sending message: " + ec.message(),
+                      Logger::Level::Error);
         }
       });
 }
@@ -42,8 +43,9 @@ void ServerSession::listen() {
         }
 
         if (msg) {
-          std::cout << playerName_ << " ACTION: " << msg->action()
-                    << ", payload: " << msg->payload() << '\n';
+          Logger::Log(playerName_ + " ACTION: " +
+                      std::to_string(static_cast<int>(msg->action())) +
+                      ", payload: " + std::string(msg->payload())); // todo
 
           handler_->OnMessageReceived(*msg, *self);
 
@@ -59,9 +61,9 @@ void ServerSession::handleError(const boost::system::error_code &ec,
                                 const std::string &context) {
   if (ec == boost::asio::error::eof ||
       ec == boost::asio::error::connection_reset) {
-    std::cout << "[INFO] Client disconnected.\n";
+    Logger::Log("Client disconnected.");
   } else {
-    std::cerr << "[ERROR] " << context << ": " << ec.message() << '\n';
+    Logger::Log(context + ": " + ec.message(), Logger::Level::Error);
   }
 
   boost::system::error_code ignore;
