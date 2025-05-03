@@ -8,13 +8,13 @@
 
 namespace soosh {
 
-class ServerSession;
+class ClientSession;
 
 class GameMessageHandler : public IMessageHandler {
 public:
   GameMessageHandler();
   void OnMessageReceived(const soosh::ClientMessage &message,
-                         ServerSession &session) override;
+                         ClientSession &session) override;
 
 private:
   soosh::GameSession gameSession_;

@@ -1,12 +1,12 @@
 #include "handlers/game_message_handler.h"
-#include "networking/server_session.h"
+#include "networking/client_session.h"
 
 namespace soosh {
 
 GameMessageHandler::GameMessageHandler() : gameSession_() {}
 
 void GameMessageHandler::OnMessageReceived(const soosh::ClientMessage &message,
-                                           ServerSession &session) {
+                                           ClientSession &session) {
   const auto action = message.action();
   const std::string &payload = message.payload();
 

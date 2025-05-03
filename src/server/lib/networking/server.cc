@@ -1,6 +1,6 @@
 #include "networking/server.h"
 #include "handlers/game_message_handler.h"
-#include "networking/server_session.h"
+#include "networking/client_session.h"
 #include "utils/logger.h"
 #include <boost/asio.hpp>
 
@@ -24,7 +24,7 @@ void Server::accept() {
   acceptor_.async_accept(
       *socket, [this, socket](const boost::system::error_code &ec) {
         if (!ec) {
-          std::make_shared<ServerSession>(std::move(socket), messageHandler_)
+          std::make_shared<ClientSession>(std::move(socket), messageHandler_)
               ->Start();
         } else {
           Logger::Log("Accept failed: " + ec.message(), Logger::Level::Error);

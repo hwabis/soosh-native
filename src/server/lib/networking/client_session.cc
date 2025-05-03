@@ -1,15 +1,15 @@
-#include "networking/server_session.h"
+#include "networking/client_session.h"
 #include "protobuf_stream_utils.h"
 #include "utils/logger.h"
 
 namespace soosh {
 
-ServerSession::ServerSession(std::shared_ptr<ip::tcp::socket> socket,
+ClientSession::ClientSession(std::shared_ptr<ip::tcp::socket> socket,
                              std::shared_ptr<IMessageHandler> handler)
     : socket_(std::move(socket)), handler_(std::move(handler)),
       timer_(socket_->get_executor()) {}
 
-void ServerSession::Start() {
+void ClientSession::Start() {
   Logger::Log("Client connected.");
   listen();
 
@@ -19,7 +19,7 @@ void ServerSession::Start() {
   SendMessage(msg);
 }
 
-void ServerSession::SendMessage(const soosh::ServerMessage &message) {
+void ClientSession::SendMessage(const soosh::ServerMessage &message) {
   auto self = shared_from_this();
 
   soosh::AsyncWriteProtobuf(
@@ -31,7 +31,7 @@ void ServerSession::SendMessage(const soosh::ServerMessage &message) {
       });
 }
 
-void ServerSession::listen() {
+void ClientSession::listen() {
   auto self = shared_from_this();
 
   soosh::AsyncReadProtobuf<soosh::ClientMessage>(
@@ -57,7 +57,7 @@ void ServerSession::listen() {
       });
 }
 
-void ServerSession::handleError(const boost::system::error_code &ec,
+void ClientSession::handleError(const boost::system::error_code &ec,
                                 const std::string &context) {
   if (ec == boost::asio::error::eof ||
       ec == boost::asio::error::connection_reset) {

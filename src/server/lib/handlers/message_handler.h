@@ -4,12 +4,12 @@
 
 namespace soosh {
 
-class ServerSession;
+class ClientSession;
 
 class IMessageHandler {
 public:
   virtual void OnMessageReceived(const soosh::ClientMessage &message,
-                                 ServerSession &session) = 0;
+                                 ClientSession &session) = 0;
   virtual ~IMessageHandler() = default;
 };
 
