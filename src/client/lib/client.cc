@@ -36,7 +36,7 @@ void Client::Start() {
 
     std::string playerName = ui_->PromptInput("Enter your player name: ");
     soosh::ClientMessage joinMsg;
-    joinMsg.set_action(soosh::ActionType::JOIN);
+    joinMsg.set_action(soosh::ActionType::Join);
     joinMsg.set_payload(playerName);
     session->SendMessage(joinMsg);
 
@@ -57,10 +57,10 @@ void Client::Start() {
 
       soosh::ClientMessage msg;
       if (userInput == "start") {
-        msg.set_action(soosh::ActionType::START);
+        msg.set_action(soosh::ActionType::Start);
         msg.set_payload("");
       } else if (userInput.starts_with("play ")) {
-        msg.set_action(soosh::ActionType::PLAY);
+        msg.set_action(soosh::ActionType::Play);
         msg.set_payload(userInput.substr(5));
       } else {
         ui_->PrintError("Unknown command.");

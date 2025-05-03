@@ -7,13 +7,13 @@ namespace soosh::utils {
 
 std::string ActionTypeToString(ActionType action) {
   switch (action) {
-  case ActionType::UNKNOWN:
+  case ActionType::Unknown:
     return "Unknown";
-  case ActionType::JOIN:
+  case ActionType::Join:
     return "Join";
-  case ActionType::START:
+  case ActionType::Start:
     return "Start";
-  case ActionType::PLAY:
+  case ActionType::Play:
     return "Play";
   default:
     return "Invalid action";

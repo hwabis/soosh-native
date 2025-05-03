@@ -3,10 +3,10 @@ syntax = "proto3";
 package soosh;
 
 enum ActionType {
-  UNKNOWN = 0;
-  JOIN = 1;
-  START = 2;
-  PLAY = 3;
+  Unknown = 0;
+  Join = 1;
+  Start = 2;
+  Play = 3;
 }
 
 enum StatusType {

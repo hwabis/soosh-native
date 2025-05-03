@@ -13,7 +13,7 @@ void GameMessageHandler::OnMessageReceived(const soosh::ClientMessage &message,
   ServerMessage response;
 
   switch (action) {
-  case soosh::ActionType::JOIN: {
+  case soosh::ActionType::Join: {
     if (!session.GetPlayerName().empty()) {
       response.set_status(soosh::StatusType::Error);
       response.set_data("Already joined as: " + session.GetPlayerName());
@@ -31,7 +31,7 @@ void GameMessageHandler::OnMessageReceived(const soosh::ClientMessage &message,
     break;
   }
 
-  case soosh::ActionType::START: {
+  case soosh::ActionType::Start: {
     std::string error;
     if (!gameSession_.StartGame(error)) {
       response.set_status(soosh::StatusType::Error);
@@ -43,7 +43,7 @@ void GameMessageHandler::OnMessageReceived(const soosh::ClientMessage &message,
     break;
   }
 
-  case soosh::ActionType::PLAY: {
+  case soosh::ActionType::Play: {
     int idx1 = -1, idx2 = -1;
 #pragma warning(push)
 #pragma warning(disable : 4996)
