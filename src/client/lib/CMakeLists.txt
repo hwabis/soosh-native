@@ -2,6 +2,7 @@ include(${CMAKE_SOURCE_DIR}/cmake/SetTargetDefaults.cmake)
 
 add_library(soosh-client-lib
   client_session.cc
+  client_ui.cc
   client.cc
 )
 

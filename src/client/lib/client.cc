@@ -5,7 +5,6 @@
 #include <boost/asio/ip/address.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/system/system_error.hpp>
-#include <iostream>
 #include <memory>
 #include <string>
 #include <thread>
@@ -14,45 +13,44 @@
 namespace soosh {
 
 Client::Client(const std::string &serverAddress, unsigned short port)
-    : serverEndpoint_(ip::make_address(serverAddress), port) {}
+    : serverEndpoint_(ip::make_address(serverAddress), port),
+      ui_(std::make_shared<ClientUi>()) {}
 
 void Client::Start() {
   try {
     ip::tcp::socket socket(ioContext_);
     socket.connect(serverEndpoint_);
     if (!socket.is_open()) {
-      std::cerr << "Socket failed to open." << "\n";
+      ui_->PrintError("Socket failed to open.");
       return;
     }
 
-    std::cout << "Connected to server at "
-              << serverEndpoint_.address().to_string() << ":"
-              << serverEndpoint_.port() << "\n";
+    ui_->PrintStatus(std::string("Connected to server at ") +
+                     serverEndpoint_.address().to_string() + ":" +
+                     std::to_string(serverEndpoint_.port()));
 
-    auto session = std::make_shared<ClientSession>(std::move(socket));
+    auto session = std::make_shared<ClientSession>(std::move(socket), ui_);
     session->Start();
 
     const std::jthread ioThread([&] { ioContext_.run(); });
 
-    std::cout << "Enter your player name: ";
-    std::string playerName;
-    std::getline(std::cin, playerName);
+    std::string playerName = ui_->PromptInput("Enter your player name: ");
     soosh::ClientMessage joinMsg;
     joinMsg.set_action(soosh::ActionType::JOIN);
     joinMsg.set_payload(playerName);
     session->SendMessage(joinMsg);
 
-    std::cout << "Available commands:\n";
-    std::cout << "  start\n";
-    std::cout << "  play <index1> <index2>\n";
-    std::cout << "  quit\n\n";
+    std::string helperMsg = "Available commands:\n"
+                            "  start\n"
+                            "  play <index1> <index2>\n"
+                            "  quit\n\n";
+    ui_->PrintStatus(helperMsg);
 
     std::string userInput;
     while (true) {
       std::getline(std::cin, userInput);
 
       if (userInput == "quit") {
-        std::cout << "Exiting client..." << "\n";
         ioContext_.stop();
         break;
       }
@@ -65,13 +63,13 @@ void Client::Start() {
         msg.set_action(soosh::ActionType::PLAY);
         msg.set_payload(userInput.substr(5));
       } else {
-        std::cerr << "Unknown command.\n";
+        ui_->PrintError("Unknown command.");
         continue;
       }
       session->SendMessage(msg);
     }
   } catch (const boost::system::system_error &e) {
-    std::cerr << "Connection failed: " << e.what() << "\n";
+    ui_->PrintError(std::string("Connection failed: ") + e.what());
   }
 }
 

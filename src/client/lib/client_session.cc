@@ -1,11 +1,12 @@
 #include "client_session.h"
+#include "client_ui.h"
 #include "protobuf_stream_utils.h"
-#include <iostream>
 
 namespace soosh {
 
-ClientSession::ClientSession(ip::tcp::socket socket)
-    : socket_(std::move(socket)) {}
+ClientSession::ClientSession(ip::tcp::socket socket,
+                             std::shared_ptr<ClientUi> ui)
+    : socket_(std::move(socket)), ui_(std::move(ui)) {}
 
 void ClientSession::Start() { listen(); }
 
@@ -13,9 +14,9 @@ void ClientSession::SendMessage(const soosh::ClientMessage &message) {
   auto self = shared_from_this();
 
   soosh::AsyncWriteProtobuf(
-      socket_, message, [self](const boost::system::error_code &ec) {
+      socket_, message, [self, this](const boost::system::error_code &ec) {
         if (ec) {
-          std::cerr << "Error sending message: " << ec.message() << '\n';
+          ui_->PrintError("Error sending message: " + ec.message());
         }
       });
 }
@@ -32,8 +33,8 @@ void ClientSession::listen() {
         }
 
         if (msg) {
-          std::cout << "Server status: " << msg->status()
-                    << ", data: " << msg->data() << '\n';
+          ui_->PrintStatus("Server status: " + msg->status() +
+                           ", data: " + msg->data());
           listen();
         } else {
           handleReceiveError(boost::asio::error::operation_aborted);
@@ -44,9 +45,9 @@ void ClientSession::listen() {
 void ClientSession::handleReceiveError(const boost::system::error_code &ec) {
   if (ec == boost::asio::error::eof ||
       ec == boost::asio::error::connection_reset) {
-    std::cout << "Server disconnected." << std::endl;
+    ui_->PrintStatus("Server disconnected.");
   } else {
-    std::cerr << "Error while receiving message: " << ec.message() << std::endl;
+    ui_->PrintError("Error while receiving message:" + ec.message());
   }
 
   if (socket_.is_open()) {
