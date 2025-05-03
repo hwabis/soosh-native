@@ -1,11 +1,18 @@
-add_library(soosh-proto-utils INTERFACE)
-
-target_include_directories(soosh-proto-utils INTERFACE
-  ${CMAKE_CURRENT_SOURCE_DIR}
+add_library(soosh-proto-utils
+  proto_enum_conversions.cc
+  proto_streams.cc
 )
 
-target_link_libraries(soosh-proto-utils INTERFACE
+target_include_directories(soosh-proto-utils PUBLIC
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_BINARY_DIR}/src/shared/proto
+)
+
+target_link_libraries(soosh-proto-utils PUBLIC
   soosh-proto
+)
+
+target_link_libraries(soosh-proto-utils PRIVATE
   protobuf::libprotobuf
   Boost::asio
 )
