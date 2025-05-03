@@ -12,11 +12,6 @@ ClientSession::ClientSession(std::shared_ptr<ip::tcp::socket> socket,
 void ClientSession::Start() {
   Logger::Log("Client connected.");
   listen();
-
-  soosh::ServerMessage msg;
-  msg.set_status("ok");
-  msg.set_data("Hello from encapsulated server!");
-  SendMessage(msg);
 }
 
 void ClientSession::SendMessage(const soosh::ServerMessage &message) {

@@ -33,8 +33,9 @@ void ClientSession::listen() {
         }
 
         if (msg) {
-          ui_->PrintStatus("Server status: " + msg->status() +
-                           ", data: " + msg->data());
+          ui_->PrintStatus(std::string("Server status: ") +
+                           std::to_string(msg->status()) +
+                           std::string(", data: ") + msg->data());
           listen();
         } else {
           handleReceiveError(boost::asio::error::operation_aborted);

@@ -9,12 +9,21 @@ enum ActionType {
   PLAY = 3;
 }
 
+enum StatusType {
+  Error = 0;
+  Update = 1;
+}
+
 message ClientMessage {
   ActionType action = 1;
   string payload = 2;
 }
 
 message ServerMessage {
-  string status = 1;
+  StatusType status = 1;
+  /*
+    todo: for now the game state can be sent as a client-printable string but
+    eventually we want to send the game model or something
+  */
   string data = 2;
 }
