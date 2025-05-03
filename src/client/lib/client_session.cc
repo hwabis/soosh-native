@@ -1,6 +1,7 @@
 #include "client_session.h"
 #include "client_ui.h"
-#include "protobuf_stream_utils.h"
+#include "proto_enum_conversions.h"
+#include "proto_streams.h"
 
 namespace soosh {
 
@@ -13,7 +14,7 @@ void ClientSession::Start() { listen(); }
 void ClientSession::SendMessage(const soosh::ClientMessage &message) {
   auto self = shared_from_this();
 
-  soosh::AsyncWriteProtobuf(
+  soosh::utils::AsyncWriteProtobuf(
       socket_, message, [self, this](const boost::system::error_code &ec) {
         if (ec) {
           ui_->PrintError("Error sending message: " + ec.message());
@@ -24,7 +25,7 @@ void ClientSession::SendMessage(const soosh::ClientMessage &message) {
 void ClientSession::listen() {
   auto self = shared_from_this();
 
-  soosh::AsyncReadProtobuf<soosh::ServerMessage>(
+  soosh::utils::AsyncReadProtobuf<soosh::ServerMessage>(
       socket_, [this, self](const boost::system::error_code &ec,
                             std::shared_ptr<soosh::ServerMessage> msg) {
         if (ec) {
@@ -34,8 +35,8 @@ void ClientSession::listen() {
 
         if (msg) {
           ui_->PrintStatus(std::string("Server status: ") +
-                           std::to_string(msg->status()) +
-                           std::string(", data: ") + msg->data());
+                           soosh::utils::StatusTypeToString(msg->status()) +
+                           std::string("\n") + msg->data());
           listen();
         } else {
           handleReceiveError(boost::asio::error::operation_aborted);

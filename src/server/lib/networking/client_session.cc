@@ -1,5 +1,6 @@
 #include "networking/client_session.h"
-#include "protobuf_stream_utils.h"
+#include "proto_enum_conversions.h"
+#include "proto_streams.h"
 #include "utils/logger.h"
 
 namespace soosh {
@@ -17,7 +18,7 @@ void ClientSession::Start() {
 void ClientSession::SendMessage(const soosh::ServerMessage &message) {
   auto self = shared_from_this();
 
-  soosh::AsyncWriteProtobuf(
+  soosh::utils::AsyncWriteProtobuf(
       *socket_, message, [self](const boost::system::error_code &ec) {
         if (ec) {
           Logger::Log("Error sending message: " + ec.message(),
@@ -29,7 +30,7 @@ void ClientSession::SendMessage(const soosh::ServerMessage &message) {
 void ClientSession::listen() {
   auto self = shared_from_this();
 
-  soosh::AsyncReadProtobuf<soosh::ClientMessage>(
+  soosh::utils::AsyncReadProtobuf<soosh::ClientMessage>(
       *socket_, [this, self](const boost::system::error_code &ec,
                              std::shared_ptr<soosh::ClientMessage> msg) {
         if (ec) {
@@ -38,9 +39,9 @@ void ClientSession::listen() {
         }
 
         if (msg) {
-          Logger::Log(playerName_ + " ACTION: " +
-                      std::to_string(static_cast<int>(msg->action())) +
-                      ", payload: " + std::string(msg->payload())); // todo
+          Logger::Log("Player: " + playerName_ + " - Action: " +
+                      soosh::utils::ActionTypeToString(msg->action()) +
+                      " - Payload: " + std::string(msg->payload()));
 
           handler_->OnMessageReceived(*msg, *self);
 

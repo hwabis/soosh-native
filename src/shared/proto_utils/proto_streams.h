@@ -6,7 +6,7 @@
 #include <google/protobuf/message.h>
 #include <memory>
 
-namespace soosh {
+namespace soosh::utils {
 
 void AsyncWriteProtobuf(
     boost::asio::ip::tcp::socket &socket,
@@ -93,4 +93,4 @@ void AsyncReadProtobuf(boost::asio::ip::tcp::socket &socket,
       });
 }
 
-} // namespace soosh
+} // namespace soosh::utils
