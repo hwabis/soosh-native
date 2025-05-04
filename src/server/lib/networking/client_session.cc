@@ -39,8 +39,7 @@ void ClientSession::listen() {
 
         if (msg) {
           Logger::Log("Player: " + playerName_ + " - Action: " +
-                      soosh::utils::ActionTypeToString(msg->action()) +
-                      " - Payload: " + std::string(msg->payload()));
+                      soosh::utils::ActionTypeToString(msg->action()));
 
           handler_->OnMessageReceived(*msg, self);
 

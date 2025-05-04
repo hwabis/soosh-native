@@ -35,9 +35,9 @@ void Client::Start() {
     const std::jthread ioThread([&] { ioContext_.run(); });
 
     std::string playerName = ui_->PromptInput("Enter your player name: ");
-    soosh::ClientMessage joinMsg;
-    joinMsg.set_action(soosh::ActionType::Join);
-    joinMsg.set_payload(playerName);
+    ClientMessage joinMsg;
+    joinMsg.set_action(ActionType::Join);
+    joinMsg.mutable_join()->set_player_name(playerName);
     session->SendMessage(joinMsg);
 
     std::string helperMsg = "Available commands:\n"
@@ -57,11 +57,19 @@ void Client::Start() {
 
       soosh::ClientMessage msg;
       if (userInput == "start") {
-        msg.set_action(soosh::ActionType::Start);
-        msg.set_payload("");
+        msg.set_action(ActionType::Start);
       } else if (userInput.starts_with("play ")) {
-        msg.set_action(soosh::ActionType::Play);
-        msg.set_payload(userInput.substr(5));
+        msg.set_action(ActionType::Play);
+
+        std::stringstream ss(userInput.substr(5));
+        int index1;
+        ss >> index1;
+        msg.mutable_play()->set_card_index1(index1);
+
+        int index2;
+        if (ss >> index2) {
+          msg.mutable_play()->set_card_index2(index2);
+        }
       } else {
         ui_->PrintError("Unknown command.");
         continue;

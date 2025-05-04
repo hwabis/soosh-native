@@ -49,18 +49,18 @@ bool GameSession::PlayCard(const std::string &playerName, int cardIndex1,
                            return p_ptr->GetName() == playerName;
                          });
   if (it == players_.end()) {
-    return false; // Player not found, no error message in this API
+    return false;
   }
   Player &player = **it;
 
   if (cardIndex1 < 0 ||
       static_cast<size_t>(cardIndex1) >= player.GetHand().size()) {
-    return false; // Invalid card index
+    return false;
   }
   if (cardIndex2.has_value() &&
       (static_cast<size_t>(cardIndex2.value()) >= player.GetHand().size() ||
        cardIndex1 == cardIndex2.value())) {
-    return false; // Invalid second card index
+    return false;
   }
 
   player.GetEnqueuedCardsToPlay().push_back(player.GetHand()[cardIndex1]);

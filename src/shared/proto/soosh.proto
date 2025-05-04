@@ -14,16 +14,27 @@ enum StatusType {
   Update = 1;
 }
 
+message JoinPayload {
+  string player_name = 1;
+}
+
+message PlayPayload {
+  int32 card_index1 = 1;
+  optional int32 card_index2 = 2;
+}
+
 message ClientMessage {
   ActionType action = 1;
-  string payload = 2;
+  oneof action_payload {
+    JoinPayload join = 2;
+    google.protobuf.Empty start = 3;
+    PlayPayload play = 4;
+  }
 }
 
 message ServerMessage {
   StatusType status = 1;
-  /*
-    todo: for now the game state can be sent as a client-printable string but
-    eventually we want to send the game model or something
-  */
   string data = 2;
 }
+
+import "google/protobuf/empty.proto";
