@@ -82,13 +82,8 @@ void GameMessageHandler::OnMessageReceived(
 
 void GameMessageHandler::OnClientDisconnected(
     std::shared_ptr<ClientSession> session) {
-  if (!session->GetPlayerName().empty()) {
+  if (session && !session->GetPlayerName().empty()) {
     gameSession_.RemovePlayer(session->GetPlayerName());
-
-    ServerMessage response;
-    response.set_status(soosh::StatusType::Update);
-    response.set_data(gameSession_.SerializeGameState());
-    session->SendMessage(response);
   }
 }
 
