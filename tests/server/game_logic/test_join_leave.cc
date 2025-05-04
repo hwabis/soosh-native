@@ -3,21 +3,21 @@
 
 using namespace soosh;
 
-TEST(GameSessionTest, AddPlayerSuccess) {
+TEST(JoinLeaveTest, AddPlayerSuccess) {
   GameSession session;
   EXPECT_TRUE(session.AddPlayer("Alice"));
   EXPECT_EQ(session.GetPlayers().size(), 1);
   EXPECT_EQ(session.GetPlayers()[0]->GetName(), "Alice");
 }
 
-TEST(GameSessionTest, AddPlayerDuplicateFails) {
+TEST(JoinLeaveTest, AddPlayerDuplicateFails) {
   GameSession session;
   session.AddPlayer("Alice");
   EXPECT_FALSE(session.AddPlayer("Alice"));
   EXPECT_EQ(session.GetPlayers().size(), 1);
 }
 
-TEST(GameSessionTest, AddPlayerAfterGameStartedFails) {
+TEST(JoinLeaveTest, AddPlayerAfterGameStartedFails) {
   GameSession session;
   session.AddPlayer("Alice");
   session.AddPlayer("Bob");
@@ -26,7 +26,7 @@ TEST(GameSessionTest, AddPlayerAfterGameStartedFails) {
   EXPECT_FALSE(session.AddPlayer("Charlie"));
 }
 
-TEST(GameSessionTest, StartGameFailsWithLessThanTwoPlayers) {
+TEST(JoinLeaveTest, StartGameFailsWithLessThanTwoPlayers) {
   GameSession session;
   session.AddPlayer("Alice");
   std::string error;
@@ -34,7 +34,7 @@ TEST(GameSessionTest, StartGameFailsWithLessThanTwoPlayers) {
   EXPECT_EQ(error, "At least two players required.");
 }
 
-TEST(GameSessionTest, StartGameSucceedsWithTwoPlayers) {
+TEST(JoinLeaveTest, StartGameSucceedsWithTwoPlayers) {
   GameSession session;
   session.AddPlayer("Alice");
   session.AddPlayer("Bob");
@@ -43,7 +43,7 @@ TEST(GameSessionTest, StartGameSucceedsWithTwoPlayers) {
   EXPECT_EQ(session.GetGameStage(), GameStage::Playing);
 }
 
-TEST(GameSessionTest, PlayerIsRemovedSuccessfully) {
+TEST(JoinLeaveTest, PlayerIsRemovedSuccessfully) {
   GameSession session;
   session.AddPlayer("Alice");
   session.AddPlayer("Bob");
@@ -57,7 +57,7 @@ TEST(GameSessionTest, PlayerIsRemovedSuccessfully) {
   }
 }
 
-TEST(GameSessionTest, RemoveNonexistentPlayerFails) {
+TEST(JoinLeaveTest, RemoveNonexistentPlayerFails) {
   GameSession session;
   session.AddPlayer("Alice");
   EXPECT_FALSE(session.RemovePlayer("Bob"));
