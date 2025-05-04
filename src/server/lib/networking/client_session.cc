@@ -55,7 +55,7 @@ void ClientSession::handleError(const boost::system::error_code &ec,
                                 const std::string &context) {
   if (ec == boost::asio::error::eof ||
       ec == boost::asio::error::connection_reset) {
-    Logger::Log("Client disconnected.");
+    Logger::Log("Client disconnected: " + playerName_);
     handler_->OnClientDisconnected(shared_from_this());
   } else {
     Logger::Log(context + ": " + ec.message(), Logger::Level::Error);

@@ -1,16 +1,19 @@
 #pragma once
 
+#include "client_session.h"
 #include "handlers/message_handler.h"
 #include <boost/asio.hpp>
+#include <memory>
 
 namespace ip = boost::asio::ip;
 
 namespace soosh {
 
-class Server {
+class Server : public std::enable_shared_from_this<Server> {
 public:
   explicit Server(unsigned short port);
   void Start();
+  const std::vector<std::shared_ptr<ClientSession>> &getSessions() const;
 
 private:
   void accept();
@@ -18,6 +21,7 @@ private:
   std::shared_ptr<soosh::IMessageHandler> messageHandler_;
   boost::asio::io_context ioContext_;
   ip::tcp::acceptor acceptor_;
+  std::vector<std::shared_ptr<ClientSession>> sessions_;
 };
 
 } // namespace soosh

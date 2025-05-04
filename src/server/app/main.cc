@@ -10,6 +10,6 @@ int main(int argc, char **argv) {
 
   CLI11_PARSE(app, argc, argv);
 
-  soosh::Server server(port);
-  server.Start();
+  auto server = std::make_shared<soosh::Server>(port);
+  server->Start();
 }

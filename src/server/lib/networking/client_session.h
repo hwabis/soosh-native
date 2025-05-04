@@ -27,7 +27,7 @@ private:
   std::shared_ptr<IMessageHandler> handler_;
   boost::asio::steady_timer timer_;
   boost::asio::streambuf buffer_;
-  std::string playerName_;
+  std::string playerName_; // todo ... why this is blank at the start
 };
 
 } // namespace soosh
