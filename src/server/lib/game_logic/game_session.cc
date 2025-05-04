@@ -12,10 +12,22 @@ bool GameSession::AddPlayer(const std::string &playerName) {
   if (gameStage_ != GameStage::Waiting)
     return false;
   for (const auto &player : players_) {
-    if (player.GetName() == playerName)
+    if (player->GetName() == playerName)
       return false;
   }
-  players_.emplace_back(playerName);
+  players_.emplace_back(std::make_unique<Player>(playerName));
+  return true;
+}
+
+bool GameSession::RemovePlayer(const std::string &playerName) {
+  auto it = std::find_if(players_.begin(), players_.end(),
+                         [&](const std::unique_ptr<Player> &p) {
+                           return p->GetName() == playerName;
+                         });
+  if (it == players_.end())
+    return false;
+
+  players_.erase(it);
   return true;
 }
 
@@ -32,14 +44,15 @@ bool GameSession::StartGame(std::string &error) {
 
 bool GameSession::PlayCard(const std::string &playerName, int cardIndex1,
                            int cardIndex2, std::string &error) {
-  auto it =
-      std::find_if(players_.begin(), players_.end(),
-                   [&](const Player &p) { return p.GetName() == playerName; });
+  auto it = std::find_if(players_.begin(), players_.end(),
+                         [&](const std::unique_ptr<Player> &p_ptr) {
+                           return p_ptr->GetName() == playerName;
+                         });
   if (it == players_.end()) {
     error = "Player not found.";
     return false;
   }
-  Player &player = *it;
+  Player &player = **it;
 
   if (cardIndex1 < 0 || cardIndex1 >= player.GetHand().size()) {
     error = "Invalid card index.";
@@ -58,7 +71,9 @@ bool GameSession::PlayCard(const std::string &playerName, int cardIndex1,
   player.SetFinishedTurn(true);
 
   if (std::all_of(players_.begin(), players_.end(),
-                  [](const Player &p) { return p.HasFinishedTurn(); })) {
+                  [](const std::unique_ptr<Player> &p_ptr) {
+                    return p_ptr->HasFinishedTurn();
+                  })) {
     advanceRound();
   }
 
@@ -67,7 +82,9 @@ bool GameSession::PlayCard(const std::string &playerName, int cardIndex1,
 
 GameStage GameSession::GetGameStage() const { return gameStage_; }
 
-const std::vector<Player> &GameSession::GetPlayers() const { return players_; }
+const std::vector<std::unique_ptr<Player>> &GameSession::GetPlayers() const {
+  return players_;
+}
 
 void GameSession::resetGame() {
   numberOfRoundsCompleted_ = 0;
@@ -75,18 +92,18 @@ void GameSession::resetGame() {
 }
 
 void GameSession::resetRound() {
-  for (auto &player : players_) {
-    player.GetInPlay().clear();
-    player.GetHand().clear();
+  for (auto &player_ptr : players_) {
+    player_ptr->GetInPlay().clear();
+    player_ptr->GetHand().clear();
   }
 }
 
 void GameSession::distributeCards() {
   auto cardsPerPlayer = 10 - players_.size();
-  for (auto &player : players_) {
+  for (auto &player_ptr : players_) {
     for (int i = 0; i < cardsPerPlayer; ++i) {
       if (!deck_.empty()) {
-        player.GetHand().push_back(deck_.top());
+        player_ptr->GetHand().push_back(deck_.top());
         deck_.pop();
       }
     }
@@ -96,27 +113,29 @@ void GameSession::distributeCards() {
 void GameSession::rotateHands() {
   if (players_.size() < 2)
     return;
-  auto lastHand = players_.back().GetHand();
+  auto lastHand = players_.back()->GetHand();
   for (auto i = players_.size() - 1; i > 0; --i) {
-    players_[i].GetHand() = players_[i - 1].GetHand();
+    players_[i]->GetHand() = players_[i - 1]->GetHand();
   }
-  players_[0].GetHand() = lastHand;
+  players_[0]->GetHand() = lastHand;
 }
 
 bool GameSession::checkRoundEnd() {
   return std::any_of(players_.begin(), players_.end(),
-                     [](Player &p) { return p.GetHand().empty(); });
+                     [](const std::unique_ptr<Player> &p_ptr) {
+                       return p_ptr->GetHand().empty();
+                     });
 }
 
 bool GameSession::checkGameEnd() { return numberOfRoundsCompleted_ >= 3; }
 
 void GameSession::advanceRound() {
-  for (auto &player : players_) {
-    player.SetFinishedTurn(false);
-    player.GetInPlay().insert(player.GetInPlay().end(),
-                              player.GetEnqueuedCardsToPlay().begin(),
-                              player.GetEnqueuedCardsToPlay().end());
-    player.GetEnqueuedCardsToPlay().clear();
+  for (auto &player_ptr : players_) {
+    player_ptr->SetFinishedTurn(false);
+    player_ptr->GetInPlay().insert(player_ptr->GetInPlay().end(),
+                                   player_ptr->GetEnqueuedCardsToPlay().begin(),
+                                   player_ptr->GetEnqueuedCardsToPlay().end());
+    player_ptr->GetEnqueuedCardsToPlay().clear();
   }
 
   if (checkRoundEnd()) {
@@ -172,11 +191,10 @@ void GameSession::initDeck() {
 std::string GameSession::SerializeGameState() const {
   std::ostringstream oss;
   oss << "Stage: " << static_cast<int>(gameStage_) << "\n";
-  for (const auto &player : players_) {
-    oss << player.GetName() << " - Hand: " << player.GetHand().size()
-        << " cards, Points: " << player.GetPoints() << "\n";
+  for (const auto &player_ptr : players_) {
+    oss << player_ptr->GetName() << " - Hand: " << player_ptr->GetHand().size()
+        << " cards, Points: " << player_ptr->GetPoints() << "\n";
   }
   return oss.str();
 }
-
 } // namespace soosh

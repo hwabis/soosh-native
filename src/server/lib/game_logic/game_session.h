@@ -2,6 +2,7 @@
 
 #include "models/card.h"
 #include "models/player.h"
+#include <memory>
 #include <stack>
 #include <string>
 #include <vector>
@@ -15,12 +16,13 @@ public:
   GameSession();
 
   bool AddPlayer(const std::string &playerName);
+  bool RemovePlayer(const std::string &playerName);
   bool StartGame(std::string &error);
   bool PlayCard(const std::string &playerName, int cardIndex1, int cardIndex2,
                 std::string &error);
 
   GameStage GetGameStage() const;
-  const std::vector<Player> &GetPlayers() const;
+  const std::vector<std::unique_ptr<Player>> &GetPlayers() const;
 
   std::string SerializeGameState() const;
 
@@ -34,7 +36,7 @@ private:
   void advanceRound();
   void initDeck();
 
-  std::vector<Player> players_;
+  std::vector<std::unique_ptr<Player>> players_;
   std::stack<Card> deck_;
   GameStage gameStage_;
   int numberOfRoundsCompleted_;
