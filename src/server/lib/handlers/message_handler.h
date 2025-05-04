@@ -9,7 +9,8 @@ class ClientSession;
 class IMessageHandler {
 public:
   virtual void OnMessageReceived(const soosh::ClientMessage &message,
-                                 ClientSession &session) = 0;
+                                 std::shared_ptr<ClientSession> session) = 0;
+  virtual void OnClientDisconnected(std::shared_ptr<ClientSession> session) = 0;
   virtual ~IMessageHandler() = default;
 };
 

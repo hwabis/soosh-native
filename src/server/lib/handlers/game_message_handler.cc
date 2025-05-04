@@ -9,8 +9,9 @@ namespace soosh {
 
 GameMessageHandler::GameMessageHandler() : gameSession_() {}
 
-void GameMessageHandler::OnMessageReceived(const soosh::ClientMessage &message,
-                                           ClientSession &session) {
+void GameMessageHandler::OnMessageReceived(
+    const soosh::ClientMessage &message,
+    std::shared_ptr<ClientSession> session) {
   const auto action = message.action();
   const std::string &payload = message.payload();
 
@@ -18,9 +19,9 @@ void GameMessageHandler::OnMessageReceived(const soosh::ClientMessage &message,
 
   switch (action) {
   case soosh::ActionType::Join: {
-    if (!session.GetPlayerName().empty()) {
+    if (!session->GetPlayerName().empty()) {
       response.set_status(soosh::StatusType::Error);
-      response.set_data("Already joined as: " + session.GetPlayerName());
+      response.set_data("Already joined as: " + session->GetPlayerName());
     } else if (payload.empty()) {
       response.set_status(soosh::StatusType::Error);
       response.set_data("Player name cannot be empty.");
@@ -28,7 +29,7 @@ void GameMessageHandler::OnMessageReceived(const soosh::ClientMessage &message,
       response.set_status(soosh::StatusType::Error);
       response.set_data("Failed to join. Name may already exist.");
     } else {
-      session.SetPlayerName(payload);
+      session->SetPlayerName(payload);
       response.set_status(soosh::StatusType::Update);
       response.set_data(gameSession_.SerializeGameState());
     }
@@ -58,7 +59,7 @@ void GameMessageHandler::OnMessageReceived(const soosh::ClientMessage &message,
       idx2 = std::nullopt;
     }
 
-    const std::string &playerName = session.GetPlayerName();
+    const std::string &playerName = session->GetPlayerName();
     if (!gameSession_.PlayCard(playerName, idx1, idx2)) {
       response.set_status(soosh::StatusType::Error);
       response.set_data(
@@ -76,7 +77,19 @@ void GameMessageHandler::OnMessageReceived(const soosh::ClientMessage &message,
     break;
   }
 
-  session.SendMessage(response);
+  session->SendMessage(response);
+}
+
+void GameMessageHandler::OnClientDisconnected(
+    std::shared_ptr<ClientSession> session) {
+  if (!session->GetPlayerName().empty()) {
+    gameSession_.RemovePlayer(session->GetPlayerName());
+
+    ServerMessage response;
+    response.set_status(soosh::StatusType::Update);
+    response.set_data(gameSession_.SerializeGameState());
+    session->SendMessage(response);
+  }
 }
 
 } // namespace soosh
