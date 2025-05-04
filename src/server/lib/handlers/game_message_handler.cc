@@ -1,5 +1,9 @@
+#pragma once
+
 #include "handlers/game_message_handler.h"
 #include "networking/client_session.h"
+#include <optional>
+#include <sstream>
 
 namespace soosh {
 
@@ -32,10 +36,10 @@ void GameMessageHandler::OnMessageReceived(const soosh::ClientMessage &message,
   }
 
   case soosh::ActionType::Start: {
-    std::string error;
-    if (!gameSession_.StartGame(error)) {
+    std::optional<std::string> error = gameSession_.StartGame();
+    if (error.has_value()) {
       response.set_status(soosh::StatusType::Error);
-      response.set_data(error);
+      response.set_data(error.value());
     } else {
       response.set_status(soosh::StatusType::Update);
       response.set_data(gameSession_.SerializeGameState());
@@ -44,17 +48,21 @@ void GameMessageHandler::OnMessageReceived(const soosh::ClientMessage &message,
   }
 
   case soosh::ActionType::Play: {
-    int idx1 = -1, idx2 = -1;
-#pragma warning(push)
-#pragma warning(disable : 4996)
-    sscanf(payload.c_str(), "%d %d", &idx1, &idx2);
-#pragma warning(pop)
+    int idx1 = -1;
+    std::optional<int> idx2;
+    std::stringstream ss(payload);
+    ss >> idx1;
+    if (ss >> *idx2) {
+      // Successfully parsed a second index
+    } else {
+      idx2 = std::nullopt;
+    }
 
     const std::string &playerName = session.GetPlayerName();
-    std::string error;
-    if (!gameSession_.PlayCard(playerName, idx1, idx2, error)) {
+    if (!gameSession_.PlayCard(playerName, idx1, idx2)) {
       response.set_status(soosh::StatusType::Error);
-      response.set_data(error);
+      response.set_data(
+          "Failed to play card(s). Invalid player or card index.");
     } else {
       response.set_status(soosh::StatusType::Update);
       response.set_data(gameSession_.SerializeGameState());

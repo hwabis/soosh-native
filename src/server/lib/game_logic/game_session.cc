@@ -1,5 +1,6 @@
 #include "game_logic/game_session.h"
 #include <algorithm>
+#include <optional>
 #include <random>
 #include <sstream>
 
@@ -31,42 +32,41 @@ bool GameSession::RemovePlayer(const std::string &playerName) {
   return true;
 }
 
-bool GameSession::StartGame(std::string &error) {
+std::optional<std::string> GameSession::StartGame() {
   if (players_.size() < 2) {
-    error = "At least two players required.";
-    return false;
+    return "At least two players required.";
   }
   resetGame();
   gameStage_ = GameStage::Playing;
   distributeCards();
-  return true;
+  return {};
 }
 
 bool GameSession::PlayCard(const std::string &playerName, int cardIndex1,
-                           int cardIndex2, std::string &error) {
+                           std::optional<int> cardIndex2) {
   auto it = std::find_if(players_.begin(), players_.end(),
                          [&](const std::unique_ptr<Player> &p_ptr) {
                            return p_ptr->GetName() == playerName;
                          });
   if (it == players_.end()) {
-    error = "Player not found.";
-    return false;
+    return false; // Player not found, no error message in this API
   }
   Player &player = **it;
 
-  if (cardIndex1 < 0 || cardIndex1 >= player.GetHand().size()) {
-    error = "Invalid card index.";
-    return false;
+  if (cardIndex1 < 0 ||
+      static_cast<size_t>(cardIndex1) >= player.GetHand().size()) {
+    return false; // Invalid card index
   }
-  if (cardIndex2 >= 0 &&
-      (cardIndex2 >= player.GetHand().size() || cardIndex1 == cardIndex2)) {
-    error = "Invalid second card index.";
-    return false;
+  if (cardIndex2.has_value() &&
+      (static_cast<size_t>(cardIndex2.value()) >= player.GetHand().size() ||
+       cardIndex1 == cardIndex2.value())) {
+    return false; // Invalid second card index
   }
 
   player.GetEnqueuedCardsToPlay().push_back(player.GetHand()[cardIndex1]);
-  if (cardIndex2 >= 0) {
-    player.GetEnqueuedCardsToPlay().push_back(player.GetHand()[cardIndex2]);
+  if (cardIndex2.has_value()) {
+    player.GetEnqueuedCardsToPlay().push_back(
+        player.GetHand()[cardIndex2.value()]);
   }
   player.SetFinishedTurn(true);
 

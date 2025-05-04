@@ -1,5 +1,6 @@
 #include "game_logic/game_session.h"
 #include <gtest/gtest.h>
+#include <optional>
 
 using namespace soosh;
 
@@ -21,25 +22,23 @@ TEST(JoinLeaveTest, AddPlayerAfterGameStartedFails) {
   GameSession session;
   session.AddPlayer("Alice");
   session.AddPlayer("Bob");
-  std::string error;
-  ASSERT_TRUE(session.StartGame(error));
+  EXPECT_TRUE(session.StartGame().has_value() == false);
   EXPECT_FALSE(session.AddPlayer("Charlie"));
 }
 
 TEST(JoinLeaveTest, StartGameFailsWithLessThanTwoPlayers) {
   GameSession session;
   session.AddPlayer("Alice");
-  std::string error;
-  EXPECT_FALSE(session.StartGame(error));
-  EXPECT_EQ(error, "At least two players required.");
+  std::optional<std::string> error = session.StartGame();
+  EXPECT_TRUE(error.has_value());
+  EXPECT_EQ(error.value(), "At least two players required.");
 }
 
 TEST(JoinLeaveTest, StartGameSucceedsWithTwoPlayers) {
   GameSession session;
   session.AddPlayer("Alice");
   session.AddPlayer("Bob");
-  std::string error;
-  EXPECT_TRUE(session.StartGame(error));
+  EXPECT_TRUE(session.StartGame().has_value() == false);
   EXPECT_EQ(session.GetGameStage(), GameStage::Playing);
 }
 

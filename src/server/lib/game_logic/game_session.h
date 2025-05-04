@@ -3,6 +3,7 @@
 #include "models/card.h"
 #include "models/player.h"
 #include <memory>
+#include <optional> // For std::optional
 #include <stack>
 #include <string>
 #include <vector>
@@ -17,9 +18,9 @@ public:
 
   bool AddPlayer(const std::string &playerName);
   bool RemovePlayer(const std::string &playerName);
-  bool StartGame(std::string &error);
-  bool PlayCard(const std::string &playerName, int cardIndex1, int cardIndex2,
-                std::string &error);
+  std::optional<std::string> StartGame();
+  bool PlayCard(const std::string &playerName, int cardIndex1,
+                std::optional<int> cardIndex2);
 
   GameStage GetGameStage() const;
   const std::vector<std::unique_ptr<Player>> &GetPlayers() const;
