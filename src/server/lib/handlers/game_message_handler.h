@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game_logic/game_session.h"
+#include "game_logic/soosh_session.h"
 #include "handlers/message_handler.h"
 #include "networking/server.h"
 #include "soosh.pb.h"
@@ -14,7 +14,7 @@ class ClientSession;
 class GameMessageHandler : public IMessageHandler {
 public:
   GameMessageHandler(std::shared_ptr<Server> server,
-                     std::shared_ptr<GameSession> gameSession);
+                     std::shared_ptr<SooshSession> gameSession);
   void OnMessageReceived(const soosh::ClientMessage &message,
                          std::shared_ptr<ClientSession> session) override;
   void OnClientDisconnected(std::shared_ptr<ClientSession> session) override;
@@ -24,7 +24,7 @@ private:
   void sendGameError(std::shared_ptr<ClientSession> session,
                      const std::string &msg);
   std::shared_ptr<Server> server_;
-  std::shared_ptr<GameSession> gameSession_;
+  std::shared_ptr<SooshSession> gameSession_;
 };
 
 } // namespace soosh

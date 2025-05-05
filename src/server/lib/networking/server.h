@@ -1,7 +1,7 @@
 #pragma once
 
 #include "client_session.h"
-#include "game_logic/game_session.h"
+#include "game_logic/soosh_session.h"
 #include "handlers/message_handler.h"
 #include <boost/asio.hpp>
 #include <memory>
@@ -23,7 +23,7 @@ private:
   boost::asio::io_context ioContext_;
   ip::tcp::acceptor acceptor_;
   std::vector<std::shared_ptr<ClientSession>> sessions_;
-  std::shared_ptr<GameSession> gameSession_;
+  std::shared_ptr<SooshSession> gameSession_;
 };
 
 } // namespace soosh

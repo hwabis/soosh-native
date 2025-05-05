@@ -1,7 +1,7 @@
 include(${CMAKE_SOURCE_DIR}/cmake/SetTargetDefaults.cmake)
 
 add_library(soosh-server-lib
-  game_logic/game_session.cc
+  game_logic/soosh_session.cc
   handlers/game_message_handler.cc
   networking/client_session.cc
   networking/server.cc

@@ -12,9 +12,9 @@ namespace soosh {
 
 enum class GameStage { Waiting, Playing, Finished };
 
-class GameSession {
+class SooshSession {
 public:
-  GameSession();
+  SooshSession();
 
   bool AddPlayer(const std::string &playerName);
   bool RemovePlayer(const std::string &playerName);

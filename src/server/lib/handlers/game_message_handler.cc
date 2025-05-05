@@ -6,7 +6,7 @@
 namespace soosh {
 
 GameMessageHandler::GameMessageHandler(std::shared_ptr<Server> server,
-                                       std::shared_ptr<GameSession> gameSession)
+                                       std::shared_ptr<SooshSession> gameSession)
     : server_(server), gameSession_(gameSession) {}
 
 void GameMessageHandler::OnMessageReceived(

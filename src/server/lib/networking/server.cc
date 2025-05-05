@@ -8,7 +8,7 @@ namespace soosh {
 Server::Server(unsigned short port)
     : ioContext_(),
       acceptor_(ioContext_, ip::tcp::endpoint(ip::tcp::v4(), port)),
-      gameSession_(std::make_shared<GameSession>()) {}
+      gameSession_(std::make_shared<SooshSession>()) {}
 
 void Server::Start() {
   Logger::Log("Server started.");

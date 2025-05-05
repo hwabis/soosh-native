@@ -1,25 +1,25 @@
-#include "game_logic/game_session.h"
+#include "game_logic/soosh_session.h"
 #include <gtest/gtest.h>
 #include <optional>
 
 using namespace soosh;
 
 TEST(JoinLeaveTest, AddPlayerSuccess) {
-  GameSession session;
+  SooshSession session;
   EXPECT_TRUE(session.AddPlayer("Alice"));
   EXPECT_EQ(session.GetPlayers().size(), 1);
   EXPECT_EQ(session.GetPlayers()[0]->GetName(), "Alice");
 }
 
 TEST(JoinLeaveTest, AddPlayerDuplicateFails) {
-  GameSession session;
+  SooshSession session;
   session.AddPlayer("Alice");
   EXPECT_FALSE(session.AddPlayer("Alice"));
   EXPECT_EQ(session.GetPlayers().size(), 1);
 }
 
 TEST(JoinLeaveTest, AddPlayerAfterGameStartedFails) {
-  GameSession session;
+  SooshSession session;
   session.AddPlayer("Alice");
   session.AddPlayer("Bob");
   EXPECT_TRUE(session.StartGame().has_value() == false);
@@ -27,7 +27,7 @@ TEST(JoinLeaveTest, AddPlayerAfterGameStartedFails) {
 }
 
 TEST(JoinLeaveTest, StartGameFailsWithLessThanTwoPlayers) {
-  GameSession session;
+  SooshSession session;
   session.AddPlayer("Alice");
   std::optional<std::string> error = session.StartGame();
   EXPECT_TRUE(error.has_value());
@@ -35,7 +35,7 @@ TEST(JoinLeaveTest, StartGameFailsWithLessThanTwoPlayers) {
 }
 
 TEST(JoinLeaveTest, StartGameSucceedsWithTwoPlayers) {
-  GameSession session;
+  SooshSession session;
   session.AddPlayer("Alice");
   session.AddPlayer("Bob");
   EXPECT_TRUE(session.StartGame().has_value() == false);
@@ -43,7 +43,7 @@ TEST(JoinLeaveTest, StartGameSucceedsWithTwoPlayers) {
 }
 
 TEST(JoinLeaveTest, PlayerIsRemovedSuccessfully) {
-  GameSession session;
+  SooshSession session;
   session.AddPlayer("Alice");
   session.AddPlayer("Bob");
 
@@ -57,7 +57,7 @@ TEST(JoinLeaveTest, PlayerIsRemovedSuccessfully) {
 }
 
 TEST(JoinLeaveTest, RemoveNonexistentPlayerFails) {
-  GameSession session;
+  SooshSession session;
   session.AddPlayer("Alice");
   EXPECT_FALSE(session.RemovePlayer("Bob"));
   EXPECT_EQ(session.GetPlayers().size(), 1);

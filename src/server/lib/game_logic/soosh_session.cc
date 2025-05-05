@@ -1,4 +1,4 @@
-#include "game_logic/game_session.h"
+#include "game_logic/soosh_session.h"
 #include <algorithm>
 #include <optional>
 #include <random>
@@ -6,10 +6,10 @@
 
 namespace soosh {
 
-GameSession::GameSession()
+SooshSession::SooshSession()
     : gameStage_(GameStage::Waiting), numberOfRoundsCompleted_(0) {}
 
-bool GameSession::AddPlayer(const std::string &playerName) {
+bool SooshSession::AddPlayer(const std::string &playerName) {
   if (gameStage_ != GameStage::Waiting)
     return false;
   for (const auto &player : players_) {
@@ -20,7 +20,7 @@ bool GameSession::AddPlayer(const std::string &playerName) {
   return true;
 }
 
-bool GameSession::RemovePlayer(const std::string &playerName) {
+bool SooshSession::RemovePlayer(const std::string &playerName) {
   auto it = std::find_if(players_.begin(), players_.end(),
                          [&](const std::unique_ptr<Player> &p) {
                            return p->GetName() == playerName;
@@ -32,7 +32,7 @@ bool GameSession::RemovePlayer(const std::string &playerName) {
   return true;
 }
 
-std::optional<std::string> GameSession::StartGame() {
+std::optional<std::string> SooshSession::StartGame() {
   if (players_.size() < 2) {
     return "At least two players required.";
   }
@@ -42,7 +42,7 @@ std::optional<std::string> GameSession::StartGame() {
   return {};
 }
 
-bool GameSession::PlayCard(const std::string &playerName, int cardIndex1,
+bool SooshSession::PlayCard(const std::string &playerName, int cardIndex1,
                            std::optional<int> cardIndex2) {
   auto it = std::find_if(players_.begin(), players_.end(),
                          [&](const std::unique_ptr<Player> &p_ptr) {
@@ -80,25 +80,25 @@ bool GameSession::PlayCard(const std::string &playerName, int cardIndex1,
   return true;
 }
 
-GameStage GameSession::GetGameStage() const { return gameStage_; }
+GameStage SooshSession::GetGameStage() const { return gameStage_; }
 
-const std::vector<std::unique_ptr<Player>> &GameSession::GetPlayers() const {
+const std::vector<std::unique_ptr<Player>> &SooshSession::GetPlayers() const {
   return players_;
 }
 
-void GameSession::resetGame() {
+void SooshSession::resetGame() {
   numberOfRoundsCompleted_ = 0;
   initDeck();
 }
 
-void GameSession::resetRound() {
+void SooshSession::resetRound() {
   for (auto &player_ptr : players_) {
     player_ptr->GetInPlay().clear();
     player_ptr->GetHand().clear();
   }
 }
 
-void GameSession::distributeCards() {
+void SooshSession::distributeCards() {
   auto cardsPerPlayer = 10 - players_.size();
   for (auto &player_ptr : players_) {
     for (int i = 0; i < cardsPerPlayer; ++i) {
@@ -110,7 +110,7 @@ void GameSession::distributeCards() {
   }
 }
 
-void GameSession::rotateHands() {
+void SooshSession::rotateHands() {
   if (players_.size() < 2)
     return;
   auto lastHand = players_.back()->GetHand();
@@ -120,16 +120,16 @@ void GameSession::rotateHands() {
   players_[0]->GetHand() = lastHand;
 }
 
-bool GameSession::checkRoundEnd() {
+bool SooshSession::checkRoundEnd() {
   return std::any_of(players_.begin(), players_.end(),
                      [](const std::unique_ptr<Player> &p_ptr) {
                        return p_ptr->GetHand().empty();
                      });
 }
 
-bool GameSession::checkGameEnd() { return numberOfRoundsCompleted_ >= 3; }
+bool SooshSession::checkGameEnd() { return numberOfRoundsCompleted_ >= 3; }
 
-void GameSession::advanceRound() {
+void SooshSession::advanceRound() {
   for (auto &player_ptr : players_) {
     player_ptr->SetFinishedTurn(false);
     player_ptr->GetInPlay().insert(player_ptr->GetInPlay().end(),
@@ -148,7 +148,7 @@ void GameSession::advanceRound() {
   }
 }
 
-void GameSession::initDeck() {
+void SooshSession::initDeck() {
   deck_ = {};
   for (int i = 0; i < 14; ++i) {
     deck_.push(Card(CardType::Tempura));
@@ -188,7 +188,7 @@ void GameSession::initDeck() {
   }
 }
 
-std::string GameSession::SerializeGameState() const {
+std::string SooshSession::SerializeGameState() const {
   std::ostringstream oss;
   oss << "Stage: " << static_cast<int>(gameStage_) << "\n";
   for (const auto &player_ptr : players_) {
