@@ -11,9 +11,9 @@ namespace soosh {
 
 class ClientSession;
 
-class GameMessageHandler : public IMessageHandler {
+class SooshMessageHandler : public IMessageHandler {
 public:
-  GameMessageHandler(std::shared_ptr<Server> server,
+  SooshMessageHandler(std::shared_ptr<Server> server,
                      std::shared_ptr<SooshSession> gameSession);
   void OnMessageReceived(const soosh::ClientMessage &message,
                          std::shared_ptr<ClientSession> session) override;

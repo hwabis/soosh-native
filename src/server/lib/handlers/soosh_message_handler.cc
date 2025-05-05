@@ -1,15 +1,15 @@
-#include "handlers/game_message_handler.h"
+#include "handlers/soosh_message_handler.h"
 #include "networking/client_session.h"
 #include <optional>
 #include <sstream>
 
 namespace soosh {
 
-GameMessageHandler::GameMessageHandler(std::shared_ptr<Server> server,
+SooshMessageHandler::SooshMessageHandler(std::shared_ptr<Server> server,
                                        std::shared_ptr<SooshSession> gameSession)
     : server_(server), gameSession_(gameSession) {}
 
-void GameMessageHandler::OnMessageReceived(
+void SooshMessageHandler::OnMessageReceived(
     const soosh::ClientMessage &message,
     std::shared_ptr<ClientSession> session) {
   const auto action = message.action();
@@ -72,14 +72,14 @@ void GameMessageHandler::OnMessageReceived(
   }
 }
 
-void GameMessageHandler::OnClientDisconnected(
+void SooshMessageHandler::OnClientDisconnected(
     std::shared_ptr<ClientSession> session) {
   if (session && !session->GetPlayerName().empty()) {
     gameSession_->RemovePlayer(session->GetPlayerName());
   }
 }
 
-void GameMessageHandler::broadcastGameState() {
+void SooshMessageHandler::broadcastGameState() {
   for (const auto &otherSession : server_->getSessions()) {
     ServerMessage updateMessage;
     updateMessage.set_status(soosh::StatusType::Update);
@@ -88,7 +88,7 @@ void GameMessageHandler::broadcastGameState() {
   }
 }
 
-void GameMessageHandler::sendGameError(std::shared_ptr<ClientSession> session,
+void SooshMessageHandler::sendGameError(std::shared_ptr<ClientSession> session,
                                        const std::string &msg) {
   ServerMessage errorMessage;
   errorMessage.set_status(soosh::StatusType::Error);

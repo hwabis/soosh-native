@@ -1,5 +1,5 @@
 #include "networking/server.h"
-#include "handlers/game_message_handler.h"
+#include "handlers/soosh_message_handler.h"
 #include "utils/logger.h"
 #include <boost/asio.hpp>
 
@@ -13,7 +13,7 @@ Server::Server(unsigned short port)
 void Server::Start() {
   Logger::Log("Server started.");
   messageHandler_ =
-      std::make_shared<GameMessageHandler>(shared_from_this(), gameSession_);
+      std::make_shared<SooshMessageHandler>(shared_from_this(), gameSession_);
   accept();
   ioContext_.run();
 }
