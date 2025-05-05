@@ -13,18 +13,18 @@ class ClientSession;
 
 class GameMessageHandler : public IMessageHandler {
 public:
-  GameMessageHandler(std::shared_ptr<Server> server);
+  GameMessageHandler(std::shared_ptr<Server> server,
+                     std::shared_ptr<GameSession> gameSession);
   void OnMessageReceived(const soosh::ClientMessage &message,
                          std::shared_ptr<ClientSession> session) override;
   void OnClientDisconnected(std::shared_ptr<ClientSession> session) override;
 
 private:
   void broadcastGameState();
-  void sendGameError(const std::string &msg);
-
-  // todo this separation of concerns isn't perfect 😬
+  void sendGameError(std::shared_ptr<ClientSession> session,
+                     const std::string &msg);
   std::shared_ptr<Server> server_;
-  soosh::GameSession gameSession_;
+  std::shared_ptr<GameSession> gameSession_;
 };
 
 } // namespace soosh

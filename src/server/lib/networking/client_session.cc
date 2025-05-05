@@ -15,7 +15,7 @@ void ClientSession::Start() {
   listen();
 }
 
-void ClientSession::SendMessage(const soosh::ServerMessage &message) {
+void ClientSession::SendMessage(const soosh::ServerMessage &message) const {
   auto self = shared_from_this();
 
   soosh::utils::AsyncWriteProtobuf(

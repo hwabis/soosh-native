@@ -14,7 +14,7 @@ public:
   ClientSession(std::shared_ptr<ip::tcp::socket> socket,
                 std::shared_ptr<IMessageHandler> handler);
   void Start();
-  void SendMessage(const soosh::ServerMessage &message);
+  void SendMessage(const soosh::ServerMessage &message) const;
 
   void SetPlayerName(const std::string &name) { playerName_ = name; }
   const std::string &GetPlayerName() const { return playerName_; }

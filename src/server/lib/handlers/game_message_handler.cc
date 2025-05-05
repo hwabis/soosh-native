@@ -5,8 +5,9 @@
 
 namespace soosh {
 
-GameMessageHandler::GameMessageHandler(std::shared_ptr<Server> server)
-    : server_(server), gameSession_() {}
+GameMessageHandler::GameMessageHandler(std::shared_ptr<Server> server,
+                                       std::shared_ptr<GameSession> gameSession)
+    : server_(server), gameSession_(gameSession) {}
 
 void GameMessageHandler::OnMessageReceived(
     const soosh::ClientMessage &message,
@@ -19,25 +20,26 @@ void GameMessageHandler::OnMessageReceived(
     if (message.has_join()) {
       const std::string &playerName = message.join().player_name();
       if (!session->GetPlayerName().empty()) {
-        sendGameError("Already joined as: " + session->GetPlayerName());
+        sendGameError(session,
+                      "Already joined as: " + session->GetPlayerName());
       } else if (playerName.empty()) {
-        sendGameError("Player name cannot be empty.");
-      } else if (!gameSession_.AddPlayer(playerName)) {
-        sendGameError("Failed to join.");
+        sendGameError(session, "Player name cannot be empty.");
+      } else if (!gameSession_->AddPlayer(playerName)) {
+        sendGameError(session, "Failed to join.");
       } else {
         session->SetPlayerName(playerName);
         broadcastGameState();
       }
     } else {
-      sendGameError("Join action missing payload.");
+      sendGameError(session, "Join action missing payload.");
     }
     break;
   }
 
   case soosh::ActionType::Start: {
-    std::optional<std::string> error = gameSession_.StartGame();
+    std::optional<std::string> error = gameSession_->StartGame();
     if (error.has_value()) {
-      sendGameError(error.value());
+      sendGameError(session, error.value());
     } else {
       broadcastGameState();
     }
@@ -53,19 +55,19 @@ void GameMessageHandler::OnMessageReceived(
               : std::nullopt;
 
       const std::string &playerName = session->GetPlayerName();
-      if (!gameSession_.PlayCard(playerName, cardIndex1, cardIndex2)) {
-        sendGameError("Failed to play card(s).");
+      if (!gameSession_->PlayCard(playerName, cardIndex1, cardIndex2)) {
+        sendGameError(session, "Failed to play card(s).");
       } else {
         broadcastGameState();
       }
     } else {
-      sendGameError("Play action missing payload.");
+      sendGameError(session, "Play action missing payload.");
     }
     break;
   }
 
   default:
-    sendGameError("Unknown action received.");
+    sendGameError(session, "Unknown action received.");
     break;
   }
 }
@@ -73,7 +75,7 @@ void GameMessageHandler::OnMessageReceived(
 void GameMessageHandler::OnClientDisconnected(
     std::shared_ptr<ClientSession> session) {
   if (session && !session->GetPlayerName().empty()) {
-    gameSession_.RemovePlayer(session->GetPlayerName());
+    gameSession_->RemovePlayer(session->GetPlayerName());
   }
 }
 
@@ -81,16 +83,17 @@ void GameMessageHandler::broadcastGameState() {
   for (const auto &otherSession : server_->getSessions()) {
     ServerMessage updateMessage;
     updateMessage.set_status(soosh::StatusType::Update);
-    updateMessage.set_data(gameSession_.SerializeGameState());
+    updateMessage.set_data(gameSession_->SerializeGameState());
     otherSession->SendMessage(updateMessage);
   }
 }
 
-void GameMessageHandler::sendGameError(const std::string &msg) {
+void GameMessageHandler::sendGameError(std::shared_ptr<ClientSession> session,
+                                       const std::string &msg) {
   ServerMessage errorMessage;
   errorMessage.set_status(soosh::StatusType::Error);
   errorMessage.set_data(msg);
-  gameSession_->SendMessage(errorMessage);
+  session->SendMessage(errorMessage);
 }
 
 } // namespace soosh
