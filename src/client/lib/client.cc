@@ -8,7 +8,6 @@
 #include <memory>
 #include <string>
 #include <thread>
-#include <utility>
 
 namespace soosh {
 

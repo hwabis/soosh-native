@@ -13,6 +13,7 @@ target_link_libraries(soosh-proto-utils PUBLIC
 )
 
 target_link_libraries(soosh-proto-utils PRIVATE
-  protobuf::libprotobuf
+  # todo how do i get rid of all the msvc compiler warnings for these lol
+  protobuf::libprotobuf 
   Boost::asio
 )

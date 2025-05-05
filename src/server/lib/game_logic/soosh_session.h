@@ -3,7 +3,7 @@
 #include "game_logic/models/card.h"
 #include "game_logic/models/player.h"
 #include <memory>
-#include <optional> // For std::optional
+#include <optional>
 #include <stack>
 #include <string>
 #include <vector>
@@ -25,7 +25,7 @@ public:
   GameStage GetGameStage() const;
   const std::vector<std::unique_ptr<Player>> &GetPlayers() const;
 
-  std::string SerializeGameState() const;
+  std::string SerializeGameState() const; // todo lol
 
 private:
   void resetGame();

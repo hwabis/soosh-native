@@ -4,7 +4,6 @@
 #include "soosh.pb.h"
 #include <boost/asio.hpp>
 #include <memory>
-#include <string>
 
 namespace ip = boost::asio::ip;
 

@@ -1,7 +1,6 @@
 #include "handlers/soosh_message_handler.h"
 #include "networking/client_session.h"
 #include <optional>
-#include <sstream>
 
 namespace soosh {
 
