@@ -1,7 +1,7 @@
 #pragma once
 
-#include "models/card.h"
-#include "models/player.h"
+#include "game_logic/models/card.h"
+#include "game_logic/models/player.h"
 #include <memory>
 #include <optional> // For std::optional
 #include <stack>

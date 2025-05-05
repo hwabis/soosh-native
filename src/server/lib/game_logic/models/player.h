@@ -1,6 +1,6 @@
 #pragma once
 
-#include "models/card.h"
+#include "game_logic/models/card.h"
 #include <string>
 #include <vector>
 
