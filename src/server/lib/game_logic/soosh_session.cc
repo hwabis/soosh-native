@@ -43,7 +43,7 @@ std::optional<std::string> SooshSession::StartGame() {
 }
 
 bool SooshSession::PlayCard(const std::string &playerName, int cardIndex1,
-                           std::optional<int> cardIndex2) {
+                            std::optional<int> cardIndex2) {
   auto it = std::find_if(players_.begin(), players_.end(),
                          [&](const std::unique_ptr<Player> &p_ptr) {
                            return p_ptr->GetName() == playerName;

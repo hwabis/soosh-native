@@ -3,11 +3,6 @@
 
 namespace soosh {
 
-const std::string ClientUi::ANSI_COLOR_RED = "\033[31m";
-const std::string ClientUi::ANSI_COLOR_GREEN = "\033[32m";
-const std::string ClientUi::ANSI_COLOR_YELLOW = "\033[33m";
-const std::string ClientUi::ANSI_COLOR_RESET = "\033[0m";
-
 std::string ClientUi::PromptInput(std::string_view prompt) {
   std::lock_guard<std::mutex> lock(mutex_);
   std::cout << ANSI_COLOR_GREEN << prompt << ANSI_COLOR_RESET << std::endl;

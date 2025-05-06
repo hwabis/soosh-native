@@ -15,10 +15,10 @@ public:
 private:
   std::mutex mutex_;
 
-  static const std::string ANSI_COLOR_RED;
-  static const std::string ANSI_COLOR_GREEN;
-  static const std::string ANSI_COLOR_YELLOW;
-  static const std::string ANSI_COLOR_RESET;
+  static constexpr std::string_view ANSI_COLOR_RED = "\033[31m";
+  static constexpr std::string_view ANSI_COLOR_GREEN = "\033[32m";
+  static constexpr std::string_view ANSI_COLOR_YELLOW = "\033[33m";
+  static constexpr std::string_view ANSI_COLOR_RESET = "\033[0m";
 };
 
 } // namespace soosh
