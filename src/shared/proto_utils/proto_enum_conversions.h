@@ -5,8 +5,8 @@
 namespace soosh {
 namespace utils {
 
-std::string ActionTypeToString(ActionType action);
-std::string StatusTypeToString(StatusType status);
+auto ActionTypeToString(ActionType action) -> std::string;
+auto StatusTypeToString(StatusType status) -> std::string;
 
 } // namespace utils
 } // namespace soosh

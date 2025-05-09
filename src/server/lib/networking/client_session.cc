@@ -31,7 +31,7 @@ void ClientSession::listen() {
   auto self = shared_from_this();
   soosh::utils::AsyncReadProtobuf<soosh::ClientMessage>(
       *socket_, [this, self](const boost::system::error_code &ec,
-                             std::shared_ptr<soosh::ClientMessage> msg) {
+                             const std::shared_ptr<soosh::ClientMessage> &msg) {
         if (ec) {
           handleError(ec, "receiving message");
           return;
@@ -61,8 +61,7 @@ void ClientSession::handleError(const boost::system::error_code &ec,
     Logger::Log(context + ": " + ec.message(), Logger::Level::Error);
   }
 
-  boost::system::error_code ignore;
-  socket_->close(ignore);
+  socket_->close();
 }
 
 } // namespace soosh

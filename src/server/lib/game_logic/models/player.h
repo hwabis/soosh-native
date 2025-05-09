@@ -2,40 +2,51 @@
 
 #include "game_logic/models/card.h"
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace soosh {
 
 class Player {
 public:
-  explicit Player(const std::string &name) : name_(name) {}
+  explicit Player(std::string name) : name_(std::move(name)) {}
 
-  const std::string &GetName() const { return name_; }
+  [[nodiscard]] auto GetName() const -> const std::string & { return name_; }
 
-  std::vector<Card> &GetHand() { return hand_; }
-  const std::vector<Card> &GetHand() const { return hand_; }
+  [[nodiscard]] auto GetHand() -> std::vector<Card> & { return hand_; }
+  [[nodiscard]] auto GetHand() const -> const std::vector<Card> & {
+    return hand_;
+  }
 
-  std::vector<Card> &GetInPlay() { return inPlay_; }
-  const std::vector<Card> &GetInPlay() const { return inPlay_; }
+  [[nodiscard]] auto GetInPlay() -> std::vector<Card> & { return inPlay_; }
+  [[nodiscard]] auto GetInPlay() const -> const std::vector<Card> & {
+    return inPlay_;
+  }
 
-  std::vector<Card> &GetEnqueuedCardsToPlay() { return enqueuedCardsToPlay_; }
-  const std::vector<Card> &GetEnqueuedCardsToPlay() const {
+  [[nodiscard]] auto GetEnqueuedCardsToPlay() -> std::vector<Card> & {
+    return enqueuedCardsToPlay_;
+  }
+  [[nodiscard]] auto GetEnqueuedCardsToPlay() const
+      -> const std::vector<Card> & {
     return enqueuedCardsToPlay_;
   }
 
-  std::vector<Card> &GetEnqueuedCardsToHand() { return enqueuedCardsToHand_; }
-  const std::vector<Card> &GetEnqueuedCardsToHand() const {
+  [[nodiscard]] auto GetEnqueuedCardsToHand() -> std::vector<Card> & {
+    return enqueuedCardsToHand_;
+  }
+  [[nodiscard]] auto GetEnqueuedCardsToHand() const
+      -> const std::vector<Card> & {
     return enqueuedCardsToHand_;
   }
 
-  bool HasFinishedTurn() const { return finishedTurn_; }
+  [[nodiscard]] auto HasFinishedTurn() const -> bool { return finishedTurn_; }
   void SetFinishedTurn(bool finished) { finishedTurn_ = finished; }
 
-  int GetPoints() const { return points_; }
+  [[nodiscard]] auto GetPoints() const -> int { return points_; }
   void SetPoints(int points) { points_ = points; }
 
 private:
-  const std::string name_;
+  std::string name_;
   std::vector<Card> hand_;
   std::vector<Card> inPlay_;
   std::vector<Card> enqueuedCardsToPlay_;

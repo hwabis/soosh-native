@@ -20,7 +20,7 @@ void Logger::Log(std::string_view msg, Level level) {
   }
 
   std::lock_guard<std::mutex> lock(logMutex_);
-  std::cout << levelStr << msg << std::endl;
+  std::cout << levelStr << msg << '\n';
 }
 
 } // namespace soosh

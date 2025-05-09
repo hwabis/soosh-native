@@ -3,9 +3,9 @@
 
 namespace soosh {
 
-std::string ClientUi::PromptInput(std::string_view prompt) {
+auto ClientUi::PromptInput(std::string_view prompt) -> std::string {
   std::lock_guard<std::mutex> lock(mutex_);
-  std::cout << ANSI_COLOR_GREEN << prompt << ANSI_COLOR_RESET << std::endl;
+  std::cout << ANSI_COLOR_GREEN << prompt << ANSI_COLOR_RESET << '\n';
 
   std::string input;
   std::getline(std::cin, input);

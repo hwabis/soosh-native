@@ -14,15 +14,15 @@ class ClientSession;
 class SooshMessageHandler : public IMessageHandler {
 public:
   SooshMessageHandler(std::shared_ptr<Server> server,
-                     std::shared_ptr<SooshSession> gameSession);
+                      std::shared_ptr<SooshSession> gameSession);
   void OnMessageReceived(const soosh::ClientMessage &message,
                          std::shared_ptr<ClientSession> session) override;
   void OnClientDisconnected(std::shared_ptr<ClientSession> session) override;
 
 private:
   void broadcastGameState();
-  void sendGameError(std::shared_ptr<ClientSession> session,
-                     const std::string &msg);
+  static void sendGameError(const std::shared_ptr<ClientSession> &session,
+                            const std::string &msg);
   std::shared_ptr<Server> server_;
   std::shared_ptr<SooshSession> gameSession_;
 };

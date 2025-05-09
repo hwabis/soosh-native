@@ -1,12 +1,13 @@
 #include "handlers/soosh_message_handler.h"
 #include "networking/client_session.h"
 #include <optional>
+#include <utility>
 
 namespace soosh {
 
-SooshMessageHandler::SooshMessageHandler(std::shared_ptr<Server> server,
-                                       std::shared_ptr<SooshSession> gameSession)
-    : server_(server), gameSession_(gameSession) {}
+SooshMessageHandler::SooshMessageHandler(
+    std::shared_ptr<Server> server, std::shared_ptr<SooshSession> gameSession)
+    : server_(std::move(server)), gameSession_(std::move(gameSession)) {}
 
 void SooshMessageHandler::OnMessageReceived(
     const soosh::ClientMessage &message,
@@ -87,8 +88,8 @@ void SooshMessageHandler::broadcastGameState() {
   }
 }
 
-void SooshMessageHandler::sendGameError(std::shared_ptr<ClientSession> session,
-                                       const std::string &msg) {
+void SooshMessageHandler::sendGameError(
+    const std::shared_ptr<ClientSession> &session, const std::string &msg) {
   ServerMessage errorMessage;
   errorMessage.set_status(soosh::StatusType::Error);
   errorMessage.set_data(msg);

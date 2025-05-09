@@ -9,24 +9,27 @@ namespace soosh {
 SooshSession::SooshSession()
     : gameStage_(GameStage::Waiting), numberOfRoundsCompleted_(0) {}
 
-bool SooshSession::AddPlayer(const std::string &playerName) {
-  if (gameStage_ != GameStage::Waiting)
+auto SooshSession::AddPlayer(const std::string &playerName) -> bool {
+  if (gameStage_ != GameStage::Waiting) {
     return false;
+  }
   for (const auto &player : players_) {
-    if (player->GetName() == playerName)
+    if (player->GetName() == playerName) {
       return false;
+    }
   }
   players_.emplace_back(std::make_unique<Player>(playerName));
   return true;
 }
 
-bool SooshSession::RemovePlayer(const std::string &playerName) {
-  auto it = std::find_if(players_.begin(), players_.end(),
-                         [&](const std::unique_ptr<Player> &p) {
-                           return p->GetName() == playerName;
-                         });
-  if (it == players_.end())
+auto SooshSession::RemovePlayer(const std::string &playerName) -> bool {
+  auto it =
+      std::ranges::find_if(players_, [&](const std::unique_ptr<Player> &p) {
+        return p->GetName() == playerName;
+      });
+  if (it == players_.end()) {
     return false;
+  }
 
   players_.erase(it);
   return true;
@@ -111,8 +114,9 @@ void SooshSession::distributeCards() {
 }
 
 void SooshSession::rotateHands() {
-  if (players_.size() < 2)
+  if (players_.size() < 2) {
     return;
+  }
   auto lastHand = players_.back()->GetHand();
   for (auto i = players_.size() - 1; i > 0; --i) {
     players_[i]->GetHand() = players_[i - 1]->GetHand();
@@ -127,7 +131,9 @@ bool SooshSession::checkRoundEnd() {
                      });
 }
 
-bool SooshSession::checkGameEnd() { return numberOfRoundsCompleted_ >= 3; }
+auto SooshSession::checkGameEnd() const -> bool {
+  return numberOfRoundsCompleted_ >= 3;
+}
 
 void SooshSession::advanceRound() {
   for (auto &player_ptr : players_) {
@@ -151,28 +157,37 @@ void SooshSession::advanceRound() {
 void SooshSession::initDeck() {
   deck_ = {};
   for (int i = 0; i < 14; ++i) {
-    deck_.push(Card(CardType::Tempura));
-    deck_.push(Card(CardType::Sashimi));
-    deck_.push(Card(CardType::Dumpling));
+    deck_.emplace(CardType::Tempura);
+    deck_.emplace(CardType::Sashimi);
+    deck_.emplace(CardType::Dumpling);
   }
-  for (int i = 0; i < 12; ++i)
-    deck_.push(Card(CardType::MakiRoll2));
-  for (int i = 0; i < 8; ++i)
-    deck_.push(Card(CardType::MakiRoll3));
-  for (int i = 0; i < 6; ++i)
-    deck_.push(Card(CardType::MakiRoll1));
-  for (int i = 0; i < 10; ++i)
-    deck_.push(Card(CardType::SalmonNigiri));
-  for (int i = 0; i < 5; ++i)
-    deck_.push(Card(CardType::SquidNigiri));
-  for (int i = 0; i < 5; ++i)
-    deck_.push(Card(CardType::EggNigiri));
-  for (int i = 0; i < 10; ++i)
-    deck_.push(Card(CardType::Pudding));
-  for (int i = 0; i < 6; ++i)
-    deck_.push(Card(CardType::Wasabi));
-  for (int i = 0; i < 4; ++i)
-    deck_.push(Card(CardType::Chopsticks));
+  for (int i = 0; i < 12; ++i) {
+    deck_.emplace(CardType::MakiRoll2);
+  }
+  for (int i = 0; i < 8; ++i) {
+    deck_.emplace(CardType::MakiRoll3);
+  }
+  for (int i = 0; i < 6; ++i) {
+    deck_.emplace(CardType::MakiRoll1);
+  }
+  for (int i = 0; i < 10; ++i) {
+    deck_.emplace(CardType::SalmonNigiri);
+  }
+  for (int i = 0; i < 5; ++i) {
+    deck_.emplace(CardType::SquidNigiri);
+  }
+  for (int i = 0; i < 5; ++i) {
+    deck_.emplace(CardType::EggNigiri);
+  }
+  for (int i = 0; i < 10; ++i) {
+    deck_.emplace(CardType::Pudding);
+  }
+  for (int i = 0; i < 6; ++i) {
+    deck_.emplace(CardType::Wasabi);
+  }
+  for (int i = 0; i < 4; ++i) {
+    deck_.emplace(CardType::Chopsticks);
+  }
 
   // Shuffle the deck
   std::vector<Card> deckVec;
@@ -188,7 +203,7 @@ void SooshSession::initDeck() {
   }
 }
 
-std::string SooshSession::SerializeGameState() const {
+auto SooshSession::SerializeGameState() const -> std::string {
   std::ostringstream oss;
   oss << "Stage: " << static_cast<int>(gameStage_) << "\n";
   for (const auto &player_ptr : players_) {

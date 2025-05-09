@@ -61,11 +61,11 @@ void Client::Start() {
         msg.set_action(ActionType::Play);
 
         std::stringstream ss(userInput.substr(5));
-        int index1;
+        int index1 = 0;
         ss >> index1;
         msg.mutable_play()->set_card_index1(index1);
 
-        int index2;
+        int index2 = 0;
         if (ss >> index2) {
           msg.mutable_play()->set_card_index2(index2);
         }

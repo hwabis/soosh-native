@@ -27,7 +27,7 @@ void ClientSession::listen() {
 
   soosh::utils::AsyncReadProtobuf<soosh::ServerMessage>(
       socket_, [this, self](const boost::system::error_code &ec,
-                            std::shared_ptr<soosh::ServerMessage> msg) {
+                            const std::shared_ptr<soosh::ServerMessage> &msg) {
         if (ec) {
           handleReceiveError(ec);
           return;

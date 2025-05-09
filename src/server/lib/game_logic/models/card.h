@@ -4,7 +4,7 @@
 
 namespace soosh {
 
-enum class CardType {
+enum class CardType : std::uint8_t {
   Tempura,
   Sashimi,
   Dumpling,
@@ -22,8 +22,8 @@ enum class CardType {
 class Card {
 public:
   explicit Card(CardType type) : type_(type) {}
-  CardType GetType() const { return type_; }
-  std::string ToString() const;
+  [[nodiscard]] auto GetType() const -> CardType { return type_; }
+  [[nodiscard]] auto ToString() const -> std::string; // todo lol
 
 private:
   CardType type_;

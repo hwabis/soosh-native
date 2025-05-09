@@ -5,7 +5,7 @@ namespace soosh {
 
 class Logger {
 public:
-  enum class Level { Info, Warning, Error };
+  enum class Level : std::uint8_t { Info, Warning, Error };
 
   static void Log(std::string_view msg, Level level = Level::Info);
 

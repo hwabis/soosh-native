@@ -8,7 +8,7 @@ namespace soosh {
 
 class ClientUi {
 public:
-  std::string PromptInput(std::string_view prompt);
+  auto PromptInput(std::string_view prompt) -> std::string;
   void PrintStatus(std::string_view msg);
   void PrintError(std::string_view msg);
 

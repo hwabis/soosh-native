@@ -17,7 +17,9 @@ public:
   void SendMessage(const soosh::ServerMessage &message) const;
 
   void SetPlayerName(const std::string &name) { playerName_ = name; }
-  const std::string &GetPlayerName() const { return playerName_; }
+  [[nodiscard]] auto GetPlayerName() const -> const std::string & {
+    return playerName_;
+  }
 
 private:
   void listen();

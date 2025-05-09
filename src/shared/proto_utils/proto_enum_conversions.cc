@@ -4,7 +4,7 @@
 namespace soosh {
 namespace utils {
 
-std::string ActionTypeToString(ActionType action) {
+auto ActionTypeToString(ActionType action) -> std::string {
   switch (action) {
   case ActionType::Unknown:
     return "Unknown";
@@ -19,7 +19,7 @@ std::string ActionTypeToString(ActionType action) {
   }
 }
 
-std::string StatusTypeToString(StatusType status) {
+auto StatusTypeToString(StatusType status) -> std::string {
   switch (status) {
   case StatusType::Error:
     return "Error";

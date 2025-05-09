@@ -31,8 +31,7 @@ void AsyncReadProtobuf(boost::asio::ip::tcp::socket &socket,
         std::memcpy(&msgSize, sizeBuf->data(), 4);
 
         if (msgSize > 10 * 1024 * 1024) {
-          std::cerr << "Protobuf message size too large: " << msgSize
-                    << std::endl;
+          std::cerr << "Protobuf message size too large: " << msgSize << '\n';
           onMessage(boost::asio::error::message_size, nullptr);
           return;
         }
@@ -61,7 +60,7 @@ void AsyncReadProtobuf(boost::asio::ip::tcp::socket &socket,
               auto message = std::make_shared<MessageType>();
               if (!message->ParseFromArray(msgBuf->data(),
                                            static_cast<int>(bytes_read))) {
-                std::cerr << "Failed to parse protobuf message" << std::endl;
+                std::cerr << "Failed to parse protobuf message" << '\n';
                 onMessage(boost::asio::error::operation_aborted, nullptr);
                 return;
               }
