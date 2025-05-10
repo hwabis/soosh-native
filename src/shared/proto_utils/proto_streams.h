@@ -9,7 +9,7 @@ namespace utils {
 void AsyncWriteProtobuf(
     boost::asio::ip::tcp::socket &socket,
     const google::protobuf::Message &message,
-    std::function<void(const boost::system::error_code &)> onComplete);
+    const std::function<void(const boost::system::error_code &)> &onComplete);
 
 template <typename MessageType>
 void AsyncReadProtobuf(boost::asio::ip::tcp::socket &socket,

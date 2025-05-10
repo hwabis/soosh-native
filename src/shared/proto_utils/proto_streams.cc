@@ -10,16 +10,16 @@ namespace utils {
 void AsyncWriteProtobuf(
     boost::asio::ip::tcp::socket &socket,
     const google::protobuf::Message &message,
-    std::function<void(const boost::system::error_code &)> onComplete) {
+    const std::function<void(const boost::system::error_code &)> &onComplete) {
 
   auto serialized = std::make_shared<std::string>();
   if (!message.SerializeToString(serialized.get())) {
-    std::cerr << "Failed to serialize protobuf message" << std::endl;
+    std::cerr << "Failed to serialize protobuf message" << "\n";
     onComplete(boost::asio::error::operation_aborted);
     return;
   }
 
-  uint32_t size = static_cast<uint32_t>(serialized->size());
+  auto size = static_cast<uint32_t>(serialized->size());
   auto sizeBuf = std::make_shared<std::array<char, 4>>();
   std::memcpy(sizeBuf->data(), &size, 4);
 
