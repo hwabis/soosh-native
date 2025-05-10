@@ -15,7 +15,7 @@ auto SooshSession::AddPlayer(const std::string &playerName) -> bool {
   }
   for (const auto &player : players_) {
     if (player->GetName() == playerName) {
-      return false;
+      return false; // todo allow players to re-join if they disconnected
     }
   }
   players_.emplace_back(std::make_unique<Player>(playerName));
@@ -207,8 +207,11 @@ auto SooshSession::SerializeGameState() const -> std::string {
   std::ostringstream oss;
   oss << "Stage: " << static_cast<int>(gameStage_) << "\n";
   for (const auto &player_ptr : players_) {
-    oss << player_ptr->GetName() << " - Hand: " << player_ptr->GetHand().size()
-        << " cards, Points: " << player_ptr->GetPoints() << "\n";
+    oss << player_ptr->GetName() << " - " << player_ptr->GetPoints()
+        << " points\n";
+    for (const auto &card : player_ptr->GetHand()) {
+      oss << "  " << card.ToString() << "\n";
+    }
   }
   return oss.str();
 }

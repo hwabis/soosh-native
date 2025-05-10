@@ -26,7 +26,8 @@ public:
   [[nodiscard]] auto GetPlayers() const
       -> const std::vector<std::unique_ptr<Player>> &;
 
-  [[nodiscard]] auto SerializeGameState() const -> std::string; // todo lol
+  // todo this should actually be a game object and not a string
+  [[nodiscard]] auto SerializeGameState() const -> std::string;
 
 private:
   void resetGame();
