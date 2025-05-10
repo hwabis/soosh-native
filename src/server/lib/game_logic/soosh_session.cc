@@ -45,12 +45,12 @@ std::optional<std::string> SooshSession::StartGame() {
   return {};
 }
 
-bool SooshSession::PlayCard(const std::string &playerName, int cardIndex1,
-                            std::optional<int> cardIndex2) {
-  auto it = std::find_if(players_.begin(), players_.end(),
-                         [&](const std::unique_ptr<Player> &p_ptr) {
-                           return p_ptr->GetName() == playerName;
-                         });
+auto SooshSession::PlayCard(const std::string &playerName, int cardIndex1,
+                            std::optional<int> cardIndex2) -> bool {
+  auto it =
+      std::ranges::find_if(players_, [&](const std::unique_ptr<Player> &p_ptr) {
+        return p_ptr->GetName() == playerName;
+      });
   if (it == players_.end()) {
     return false;
   }
@@ -124,11 +124,11 @@ void SooshSession::rotateHands() {
   players_[0]->GetHand() = lastHand;
 }
 
-bool SooshSession::checkRoundEnd() {
-  return std::any_of(players_.begin(), players_.end(),
-                     [](const std::unique_ptr<Player> &p_ptr) {
-                       return p_ptr->GetHand().empty();
-                     });
+auto SooshSession::checkRoundEnd() -> bool {
+  return std::ranges::any_of(players_,
+                             [](const std::unique_ptr<Player> &p_ptr) {
+                               return p_ptr->GetHand().empty();
+                             });
 }
 
 auto SooshSession::checkGameEnd() const -> bool {
