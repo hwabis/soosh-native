@@ -97,6 +97,15 @@ auto SooshSession::PlayCard(const std::string &playerName, int cardIndex1,
 
     player.GetInPlay().push_back(player.GetHand()[index2]);
     player.GetHand().erase(player.GetHand().begin() + index2);
+
+    auto &inPlay = player.GetInPlay();
+    auto it = std::ranges::find_if(inPlay, [](const Card &card) {
+      return card.GetType() == CardType::Chopsticks;
+    });
+    if (it != inPlay.end()) {
+      player.GetHand().push_back(*it);
+      inPlay.erase(it);
+    }
   }
 
   player.SetFinishedTurn(true);
@@ -260,8 +269,10 @@ auto SooshSession::SerializeHand(const std::string &playerName) const
 
   if (!player.HasFinishedTurn()) {
     oss << "Your hand:\n";
+    int index = 0;
     for (const auto &card : player.GetHand()) {
-      oss << "- " << card.ToString() << "\n";
+      oss << index << ". " << card.ToString() << "\n";
+      ++index;
     }
   } else {
     oss << "Waiting for other players...\n";
