@@ -14,7 +14,7 @@ public:
   IMessageHandler(IMessageHandler &&) = delete;
   auto operator=(IMessageHandler &&) -> IMessageHandler & = delete;
 
-  virtual void OnMessageReceived(const soosh::ClientMessage &message,
+  virtual void OnMessageReceived(const ClientMessage &message,
                                  std::shared_ptr<ClientSession> session) = 0;
   virtual void OnClientDisconnected(std::shared_ptr<ClientSession> session) = 0;
   virtual ~IMessageHandler() = default;

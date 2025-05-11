@@ -10,13 +10,12 @@ SooshMessageHandler::SooshMessageHandler(
     : server_(std::move(server)), gameSession_(std::move(gameSession)) {}
 
 void SooshMessageHandler::OnMessageReceived(
-    const soosh::ClientMessage &message,
-    std::shared_ptr<ClientSession> session) {
+    const ClientMessage &message, std::shared_ptr<ClientSession> session) {
   const auto action = message.action();
   ServerMessage response;
 
   switch (action) {
-  case soosh::ActionType::Join: {
+  case ActionType::Join: {
     if (message.has_join()) {
       const std::string &playerName = message.join().player_name();
       if (!session->GetPlayerName().empty()) {
@@ -36,7 +35,7 @@ void SooshMessageHandler::OnMessageReceived(
     break;
   }
 
-  case soosh::ActionType::Start: {
+  case ActionType::Start: {
     std::optional<std::string> error = gameSession_->Start();
     if (error.has_value()) {
       sendGameError(session, error.value());
@@ -46,7 +45,7 @@ void SooshMessageHandler::OnMessageReceived(
     break;
   }
 
-  case soosh::ActionType::Play: {
+  case ActionType::Play: {
     if (message.has_play()) {
       int cardIndex1 = message.play().card_index1();
       std::optional<int> cardIndex2 =
@@ -82,7 +81,7 @@ void SooshMessageHandler::OnClientDisconnected(
 void SooshMessageHandler::broadcastGameState() {
   for (const auto &otherSession : server_->getSessions()) {
     ServerMessage updateMessage;
-    updateMessage.set_status(soosh::StatusType::Update);
+    updateMessage.set_status(StatusType::Update);
     updateMessage.set_data(gameSession_->SerializeGameState());
     otherSession->SendMessage(updateMessage);
   }
@@ -91,7 +90,7 @@ void SooshMessageHandler::broadcastGameState() {
 void SooshMessageHandler::sendGameError(
     const std::shared_ptr<ClientSession> &session, const std::string &msg) {
   ServerMessage errorMessage;
-  errorMessage.set_status(soosh::StatusType::Error);
+  errorMessage.set_status(StatusType::Error);
   errorMessage.set_data(msg);
   session->SendMessage(errorMessage);
 }

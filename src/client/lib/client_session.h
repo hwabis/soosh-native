@@ -13,7 +13,7 @@ class ClientSession : public std::enable_shared_from_this<ClientSession> {
 public:
   explicit ClientSession(ip::tcp::socket socket, std::shared_ptr<ClientUi> ui);
   void Start();
-  void SendMessage(const soosh::ClientMessage &message);
+  void SendMessage(const ClientMessage &message);
 
 private:
   void listen();

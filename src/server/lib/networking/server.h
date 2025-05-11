@@ -20,7 +20,7 @@ public:
 private:
   void accept();
 
-  std::shared_ptr<soosh::IMessageHandler> messageHandler_;
+  std::shared_ptr<IMessageHandler> messageHandler_;
   boost::asio::io_context ioContext_;
   ip::tcp::acceptor acceptor_;
   std::vector<std::shared_ptr<ClientSession>> sessions_;

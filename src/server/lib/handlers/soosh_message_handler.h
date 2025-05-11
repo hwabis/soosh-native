@@ -15,7 +15,7 @@ class SooshMessageHandler : public IMessageHandler {
 public:
   SooshMessageHandler(std::shared_ptr<Server> server,
                       std::shared_ptr<SooshSession> gameSession);
-  void OnMessageReceived(const soosh::ClientMessage &message,
+  void OnMessageReceived(const ClientMessage &message,
                          std::shared_ptr<ClientSession> session) override;
   void OnClientDisconnected(std::shared_ptr<ClientSession> session) override;
 

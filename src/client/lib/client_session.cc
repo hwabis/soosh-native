@@ -11,7 +11,7 @@ ClientSession::ClientSession(ip::tcp::socket socket,
 
 void ClientSession::Start() { listen(); }
 
-void ClientSession::SendMessage(const soosh::ClientMessage &message) {
+void ClientSession::SendMessage(const ClientMessage &message) {
   auto self = shared_from_this();
 
   soosh::utils::AsyncWriteProtobuf(
@@ -25,9 +25,9 @@ void ClientSession::SendMessage(const soosh::ClientMessage &message) {
 void ClientSession::listen() {
   auto self = shared_from_this();
 
-  soosh::utils::AsyncReadProtobuf<soosh::ServerMessage>(
+  soosh::utils::AsyncReadProtobuf<ServerMessage>(
       socket_, [this, self](const boost::system::error_code &ec,
-                            const std::shared_ptr<soosh::ServerMessage> &msg) {
+                            const std::shared_ptr<ServerMessage> &msg) {
         if (ec) {
           handleReceiveError(ec);
           return;
