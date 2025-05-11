@@ -1,3 +1,7 @@
+# soosh-native
+
+CLI-based implementation of [Sushi Go!](https://boardgamegeek.com/boardgame/133473/sushi-go) over plain TCP (Boost.Asio).
+
 ## Developing on Windows
 
 Install the required dependencies (see `/CMakeLists.txt`). [vcpkg](https://github.com/microsoft/vcpkg) is recommended. Then run:
