@@ -37,7 +37,7 @@ void SooshMessageHandler::OnMessageReceived(
   }
 
   case soosh::ActionType::Start: {
-    std::optional<std::string> error = gameSession_->StartGame();
+    std::optional<std::string> error = gameSession_->Start();
     if (error.has_value()) {
       sendGameError(session, error.value());
     } else {

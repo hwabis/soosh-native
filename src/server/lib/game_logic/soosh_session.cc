@@ -15,8 +15,11 @@ auto SooshSession::AddPlayer(const std::string &playerName) -> bool {
   }
   for (const auto &player : players_) {
     if (player->GetName() == playerName) {
-      return false; // todo allow players to re-join if they disconnected
+      return false;
     }
+  }
+  if (players_.size() >= playerLimit_) {
+    return false;
   }
   players_.emplace_back(std::make_unique<Player>(playerName));
   return true;
@@ -35,18 +38,30 @@ auto SooshSession::RemovePlayer(const std::string &playerName) -> bool {
   return true;
 }
 
-std::optional<std::string> SooshSession::StartGame() {
+std::optional<std::string> SooshSession::Start() {
   if (players_.size() < 2) {
     return "At least two players required.";
   }
-  resetGame();
-  gameStage_ = GameStage::Playing;
-  distributeCards();
+  switch (gameStage_) {
+  case GameStage::Waiting:
+    startRound();
+    break;
+  case GameStage::Playing:
+    return "The game is already in-progress.";
+  case GameStage::Finished:
+    resetGame();
+    startRound();
+    break;
+  }
   return {};
 }
 
 auto SooshSession::PlayCard(const std::string &playerName, int cardIndex1,
                             std::optional<int> cardIndex2) -> bool {
+  if (gameStage_ != GameStage::Playing) {
+    return false;
+  }
+
   auto it =
       std::ranges::find_if(players_, [&](const std::unique_ptr<Player> &p_ptr) {
         return p_ptr->GetName() == playerName;
@@ -66,18 +81,28 @@ auto SooshSession::PlayCard(const std::string &playerName, int cardIndex1,
     return false;
   }
 
-  player.GetEnqueuedCardsToPlay().push_back(player.GetHand()[cardIndex1]);
+  player.GetInPlay().push_back(player.GetHand()[cardIndex1]);
+  player.GetHand().erase(player.GetHand().begin() + cardIndex1);
+
   if (cardIndex2.has_value()) {
-    player.GetEnqueuedCardsToPlay().push_back(
-        player.GetHand()[cardIndex2.value()]);
+    int index2 = cardIndex2.value();
+
+    // Adjust index if it came after the first erased card
+    if (index2 > cardIndex1) {
+      --index2;
+    }
+
+    player.GetInPlay().push_back(player.GetHand()[index2]);
+    player.GetHand().erase(player.GetHand().begin() + index2);
   }
+
   player.SetFinishedTurn(true);
 
   if (std::all_of(players_.begin(), players_.end(),
                   [](const std::unique_ptr<Player> &p_ptr) {
                     return p_ptr->HasFinishedTurn();
                   })) {
-    advanceRound();
+    onTurnEnd();
   }
 
   return true;
@@ -90,26 +115,51 @@ const std::vector<std::unique_ptr<Player>> &SooshSession::GetPlayers() const {
 }
 
 void SooshSession::resetGame() {
-  numberOfRoundsCompleted_ = 0;
-  initDeck();
-}
-
-void SooshSession::resetRound() {
-  for (auto &player_ptr : players_) {
-    player_ptr->GetInPlay().clear();
-    player_ptr->GetHand().clear();
+  for (auto &player : players_) {
+    player->GetInPlay().clear();
+    player->GetHand().clear();
+    player->SetPoints(0);
   }
+  gameStage_ = GameStage::Waiting;
+  numberOfRoundsCompleted_ = 0;
+  resetDeck();
 }
 
-void SooshSession::distributeCards() {
+void SooshSession::startRound() {
+  if (numberOfRoundsCompleted_ == 0) {
+    resetDeck();
+  }
+
+  gameStage_ = GameStage::Playing;
   auto cardsPerPlayer = 10 - players_.size();
-  for (auto &player_ptr : players_) {
+  for (auto &player : players_) {
     for (int i = 0; i < cardsPerPlayer; ++i) {
       if (!deck_.empty()) {
-        player_ptr->GetHand().push_back(deck_.top());
+        player->GetHand().push_back(deck_.top());
         deck_.pop();
       }
     }
+  }
+}
+
+void SooshSession::onTurnEnd() {
+  for (auto &player : players_) {
+    player->SetFinishedTurn(false);
+  }
+  bool roundOver = std::any_of(players_.begin(), players_.end(),
+                               [](const std::unique_ptr<Player> &player) {
+                                 return player->GetHand().empty();
+                               });
+  if (roundOver) {
+    ++numberOfRoundsCompleted_;
+    if (numberOfRoundsCompleted_ == maxNumberOfRounds_) {
+      gameStage_ = GameStage::Finished;
+    } else {
+      gameStage_ = GameStage::Waiting;
+    }
+    // todo calculate scores
+  } else {
+    rotateHands();
   }
 }
 
@@ -124,37 +174,7 @@ void SooshSession::rotateHands() {
   players_[0]->GetHand() = lastHand;
 }
 
-auto SooshSession::checkRoundEnd() -> bool {
-  return std::ranges::any_of(players_,
-                             [](const std::unique_ptr<Player> &p_ptr) {
-                               return p_ptr->GetHand().empty();
-                             });
-}
-
-auto SooshSession::checkGameEnd() const -> bool {
-  return numberOfRoundsCompleted_ >= 3;
-}
-
-void SooshSession::advanceRound() {
-  for (auto &player_ptr : players_) {
-    player_ptr->SetFinishedTurn(false);
-    player_ptr->GetInPlay().insert(player_ptr->GetInPlay().end(),
-                                   player_ptr->GetEnqueuedCardsToPlay().begin(),
-                                   player_ptr->GetEnqueuedCardsToPlay().end());
-    player_ptr->GetEnqueuedCardsToPlay().clear();
-  }
-
-  if (checkRoundEnd()) {
-    ++numberOfRoundsCompleted_;
-    if (checkGameEnd()) {
-      gameStage_ = GameStage::Finished;
-    } else {
-      rotateHands();
-    }
-  }
-}
-
-void SooshSession::initDeck() {
+void SooshSession::resetDeck() {
   deck_ = {};
   for (int i = 0; i < 14; ++i) {
     deck_.emplace(CardType::Tempura);

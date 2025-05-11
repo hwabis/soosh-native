@@ -22,14 +22,14 @@ TEST(JoinLeaveTest, AddPlayerAfterGameStartedFails) {
   SooshSession session;
   session.AddPlayer("Alice");
   session.AddPlayer("Bob");
-  EXPECT_TRUE(session.StartGame().has_value() == false);
+  EXPECT_TRUE(session.Start().has_value() == false);
   EXPECT_FALSE(session.AddPlayer("Charlie"));
 }
 
 TEST(JoinLeaveTest, StartGameFailsWithLessThanTwoPlayers) {
   SooshSession session;
   session.AddPlayer("Alice");
-  std::optional<std::string> error = session.StartGame();
+  std::optional<std::string> error = session.Start();
   EXPECT_TRUE(error.has_value());
   EXPECT_EQ(error.value(), "At least two players required.");
 }
@@ -38,7 +38,7 @@ TEST(JoinLeaveTest, StartGameSucceedsWithTwoPlayers) {
   SooshSession session;
   session.AddPlayer("Alice");
   session.AddPlayer("Bob");
-  EXPECT_TRUE(session.StartGame().has_value() == false);
+  EXPECT_TRUE(session.Start().has_value() == false);
   EXPECT_EQ(session.GetGameStage(), GameStage::Playing);
 }
 

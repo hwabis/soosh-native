@@ -18,7 +18,7 @@ public:
 
   auto AddPlayer(const std::string &playerName) -> bool;
   auto RemovePlayer(const std::string &playerName) -> bool;
-  auto StartGame() -> std::optional<std::string>;
+  auto Start() -> std::optional<std::string>;
   auto PlayCard(const std::string &playerName, int cardIndex1,
                 std::optional<int> cardIndex2) -> bool;
 
@@ -31,18 +31,18 @@ public:
 
 private:
   void resetGame();
-  void resetRound();
-  void distributeCards();
+  void startRound();
+  void onTurnEnd();
   void rotateHands();
-  [[nodiscard]] auto checkRoundEnd() -> bool;
-  [[nodiscard]] auto checkGameEnd() const -> bool;
-  void advanceRound();
-  void initDeck();
+  void resetDeck();
 
   std::vector<std::unique_ptr<Player>> players_;
   std::stack<Card> deck_;
   GameStage gameStage_;
   int numberOfRoundsCompleted_;
+
+  static constexpr int playerLimit_ = 5;
+  static constexpr int maxNumberOfRounds_ = 3;
 };
 
 } // namespace soosh

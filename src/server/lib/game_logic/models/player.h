@@ -23,21 +23,7 @@ public:
     return inPlay_;
   }
 
-  [[nodiscard]] auto GetEnqueuedCardsToPlay() -> std::vector<Card> & {
-    return enqueuedCardsToPlay_;
-  }
-  [[nodiscard]] auto GetEnqueuedCardsToPlay() const
-      -> const std::vector<Card> & {
-    return enqueuedCardsToPlay_;
-  }
-
-  [[nodiscard]] auto GetEnqueuedCardsToHand() -> std::vector<Card> & {
-    return enqueuedCardsToHand_;
-  }
-  [[nodiscard]] auto GetEnqueuedCardsToHand() const
-      -> const std::vector<Card> & {
-    return enqueuedCardsToHand_;
-  }
+  // todo enqueued cards to play / to hand ...
 
   [[nodiscard]] auto HasFinishedTurn() const -> bool { return finishedTurn_; }
   void SetFinishedTurn(bool finished) { finishedTurn_ = finished; }
