@@ -20,8 +20,8 @@ public:
   void OnClientDisconnected(std::shared_ptr<ClientSession> session) override;
 
 private:
-  void broadcastGameStateAndHand(const std::shared_ptr<ClientSession> &session);
-  static void sendGameError(const std::shared_ptr<ClientSession> &session,
+  void broadcastGameStateAndHand(const ClientSession &session);
+  static void sendGameError(const ClientSession &session,
                             const std::string &msg);
   std::shared_ptr<Server> server_;
   std::shared_ptr<SooshSession> gameSession_;

@@ -19,18 +19,18 @@ void SooshMessageHandler::OnMessageReceived(
     if (message.has_join()) {
       const std::string &playerName = message.join().player_name();
       if (!session->GetPlayerName().empty()) {
-        sendGameError(session,
+        sendGameError(*session,
                       "Already joined as: " + session->GetPlayerName());
       } else if (playerName.empty()) {
-        sendGameError(session, "Player name cannot be empty.");
+        sendGameError(*session, "Player name cannot be empty.");
       } else if (!gameSession_->AddPlayer(playerName)) {
-        sendGameError(session, "Failed to join.");
+        sendGameError(*session, "Failed to join.");
       } else {
         session->SetPlayerName(playerName);
-        broadcastGameStateAndHand(session);
+        broadcastGameStateAndHand(*session);
       }
     } else {
-      sendGameError(session, "Join action missing payload.");
+      sendGameError(*session, "Join action missing payload.");
     }
     break;
   }
@@ -38,9 +38,9 @@ void SooshMessageHandler::OnMessageReceived(
   case ActionType::Start: {
     std::optional<std::string> error = gameSession_->Start();
     if (error.has_value()) {
-      sendGameError(session, error.value());
+      sendGameError(*session, error.value());
     } else {
-      broadcastGameStateAndHand(session);
+      broadcastGameStateAndHand(*session);
     }
     break;
   }
@@ -55,18 +55,18 @@ void SooshMessageHandler::OnMessageReceived(
 
       const std::string &playerName = session->GetPlayerName();
       if (!gameSession_->PlayCard(playerName, cardIndex1, cardIndex2)) {
-        sendGameError(session, "Failed to play card(s).");
+        sendGameError(*session, "Failed to play card(s).");
       } else {
-        broadcastGameStateAndHand(session);
+        broadcastGameStateAndHand(*session);
       }
     } else {
-      sendGameError(session, "Play action missing payload.");
+      sendGameError(*session, "Play action missing payload.");
     }
     break;
   }
 
   default:
-    sendGameError(session, "Unknown action received.");
+    sendGameError(*session, "Unknown action received.");
     break;
   }
 }
@@ -79,7 +79,7 @@ void SooshMessageHandler::OnClientDisconnected(
 }
 
 void SooshMessageHandler::broadcastGameStateAndHand(
-    const std::shared_ptr<ClientSession> &session) {
+    const ClientSession &session) {
   for (const auto &otherSession : server_->getSessions()) {
     ServerMessage updateMessage;
     updateMessage.set_status(StatusType::Update);
@@ -89,16 +89,16 @@ void SooshMessageHandler::broadcastGameStateAndHand(
 
   ServerMessage handMessage;
   handMessage.set_status(StatusType::Update);
-  handMessage.set_data(gameSession_->SerializeHand(session->GetPlayerName()));
-  session->SendMessage(handMessage);
+  handMessage.set_data(gameSession_->SerializeHand(session.GetPlayerName()));
+  session.SendMessage(handMessage);
 }
 
-void SooshMessageHandler::sendGameError(
-    const std::shared_ptr<ClientSession> &session, const std::string &msg) {
+void SooshMessageHandler::sendGameError(const ClientSession &session,
+                                        const std::string &msg) {
   ServerMessage errorMessage;
   errorMessage.set_status(StatusType::Error);
   errorMessage.set_data(msg);
-  session->SendMessage(errorMessage);
+  session.SendMessage(errorMessage);
 }
 
 } // namespace soosh
