@@ -27,7 +27,7 @@ void SooshMessageHandler::OnMessageReceived(
         sendGameError(*session, "Failed to join.");
       } else {
         session->SetPlayerName(playerName);
-        broadcastGameStateAndHand(*session);
+        broadcastGameStateAndHands();
       }
     } else {
       sendGameError(*session, "Join action missing payload.");
@@ -40,7 +40,7 @@ void SooshMessageHandler::OnMessageReceived(
     if (error.has_value()) {
       sendGameError(*session, error.value());
     } else {
-      broadcastGameStateAndHand(*session);
+      broadcastGameStateAndHands();
     }
     break;
   }
@@ -57,7 +57,7 @@ void SooshMessageHandler::OnMessageReceived(
       if (!gameSession_->PlayCard(playerName, cardIndex1, cardIndex2)) {
         sendGameError(*session, "Failed to play card(s).");
       } else {
-        broadcastGameStateAndHand(*session);
+        broadcastGameStateAndHands();
       }
     } else {
       sendGameError(*session, "Play action missing payload.");
@@ -78,19 +78,19 @@ void SooshMessageHandler::OnClientDisconnected(
   }
 }
 
-void SooshMessageHandler::broadcastGameStateAndHand(
-    const ClientSession &session) {
-  for (const auto &otherSession : server_->getSessions()) {
+void SooshMessageHandler::broadcastGameStateAndHands() {
+  for (const auto &session : server_->getSessions()) {
     ServerMessage updateMessage;
     updateMessage.set_status(StatusType::Update);
     updateMessage.set_data(gameSession_->SerializeGameState());
-    otherSession->SendMessage(updateMessage);
-  }
+    session->SendMessage(updateMessage);
 
-  ServerMessage handMessage;
-  handMessage.set_status(StatusType::Update);
-  handMessage.set_data(gameSession_->SerializeHand(session.GetPlayerName()));
-  session.SendMessage(handMessage);
+    // Send each player only their own hand
+    ServerMessage handMessage;
+    handMessage.set_status(StatusType::Update);
+    handMessage.set_data(gameSession_->SerializeHand(session->GetPlayerName()));
+    session->SendMessage(handMessage);
+  }
 }
 
 void SooshMessageHandler::sendGameError(const ClientSession &session,

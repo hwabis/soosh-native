@@ -20,7 +20,7 @@ public:
   void OnClientDisconnected(std::shared_ptr<ClientSession> session) override;
 
 private:
-  void broadcastGameStateAndHand(const ClientSession &session);
+  void broadcastGameStateAndHands();
   static void sendGameError(const ClientSession &session,
                             const std::string &msg);
   std::shared_ptr<Server> server_;
