@@ -234,4 +234,31 @@ auto SooshSession::SerializeGameState() const -> std::string {
   }
   return oss.str();
 }
+
+auto SooshSession::SerializeHand(const std::string &playerName) const
+    -> std::string {
+  // todo make finding player& a private method
+  auto it =
+      std::ranges::find_if(players_, [&](const std::unique_ptr<Player> &p_ptr) {
+        return p_ptr->GetName() == playerName;
+      });
+  if (it == players_.end()) {
+    return "INVALID PLAYER"; // todo better error handling lol
+  }
+  Player &player = **it;
+
+  std::ostringstream oss;
+
+  if (!player.HasFinishedTurn()) {
+    oss << "Your hand:\n";
+    for (const auto &card : player.GetHand()) {
+      oss << "- " << card.ToString() << "\n";
+    }
+  } else {
+    oss << "Waiting for other players...\n";
+  }
+
+  return oss.str();
+}
+
 } // namespace soosh

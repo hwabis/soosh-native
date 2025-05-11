@@ -27,7 +27,7 @@ void SooshMessageHandler::OnMessageReceived(
         sendGameError(session, "Failed to join.");
       } else {
         session->SetPlayerName(playerName);
-        broadcastGameState();
+        broadcastGameStateAndHand(session);
       }
     } else {
       sendGameError(session, "Join action missing payload.");
@@ -40,7 +40,7 @@ void SooshMessageHandler::OnMessageReceived(
     if (error.has_value()) {
       sendGameError(session, error.value());
     } else {
-      broadcastGameState();
+      broadcastGameStateAndHand(session);
     }
     break;
   }
@@ -57,7 +57,7 @@ void SooshMessageHandler::OnMessageReceived(
       if (!gameSession_->PlayCard(playerName, cardIndex1, cardIndex2)) {
         sendGameError(session, "Failed to play card(s).");
       } else {
-        broadcastGameState();
+        broadcastGameStateAndHand(session);
       }
     } else {
       sendGameError(session, "Play action missing payload.");
@@ -78,13 +78,19 @@ void SooshMessageHandler::OnClientDisconnected(
   }
 }
 
-void SooshMessageHandler::broadcastGameState() {
+void SooshMessageHandler::broadcastGameStateAndHand(
+    const std::shared_ptr<ClientSession> &session) {
   for (const auto &otherSession : server_->getSessions()) {
     ServerMessage updateMessage;
     updateMessage.set_status(StatusType::Update);
     updateMessage.set_data(gameSession_->SerializeGameState());
     otherSession->SendMessage(updateMessage);
   }
+
+  ServerMessage handMessage;
+  handMessage.set_status(StatusType::Update);
+  handMessage.set_data(gameSession_->SerializeHand(session->GetPlayerName()));
+  session->SendMessage(handMessage);
 }
 
 void SooshMessageHandler::sendGameError(

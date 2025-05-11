@@ -28,6 +28,8 @@ public:
 
   // todo this should actually be a game object and not a string
   [[nodiscard]] auto SerializeGameState() const -> std::string;
+  [[nodiscard]] auto SerializeHand(const std::string &playerName) const
+      -> std::string;
 
 private:
   void resetGame();
