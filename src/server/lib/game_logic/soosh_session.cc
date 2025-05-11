@@ -70,6 +70,9 @@ auto SooshSession::PlayCard(const std::string &playerName, int cardIndex1,
     return false;
   }
   Player &player = **it;
+  if (player.HasFinishedTurn()) {
+    return false;
+  }
 
   if (cardIndex1 < 0 ||
       static_cast<size_t>(cardIndex1) >= player.GetHand().size()) {
@@ -77,7 +80,7 @@ auto SooshSession::PlayCard(const std::string &playerName, int cardIndex1,
   }
   if (cardIndex2.has_value() &&
       (static_cast<size_t>(cardIndex2.value()) >= player.GetHand().size() ||
-       cardIndex1 == cardIndex2.value())) {
+       cardIndex1 == cardIndex2.value() || !hasChopsticksInPlay(player))) {
     return false;
   }
 
@@ -221,6 +224,12 @@ void SooshSession::resetDeck() {
   for (const auto &card : deckVec) {
     deck_.push(card);
   }
+}
+
+auto SooshSession::hasChopsticksInPlay(const Player &player) const -> bool {
+  return std::ranges::any_of(player.GetInPlay(), [](const Card &card) {
+    return card.GetType() == CardType::Chopsticks;
+  });
 }
 
 auto SooshSession::SerializeGameState() const -> std::string {

@@ -37,6 +37,7 @@ private:
   void onTurnEnd();
   void rotateHands();
   void resetDeck();
+  [[nodiscard]] auto hasChopsticksInPlay(const Player &player) const -> bool;
 
   std::vector<std::unique_ptr<Player>> players_;
   std::stack<Card> deck_;
