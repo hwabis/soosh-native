@@ -38,6 +38,7 @@ private:
   void rotateHands();
   void resetDeck();
   [[nodiscard]] auto hasChopsticksInPlay(const Player &player) const -> bool;
+  void clearHandExceptPuddings(Player &player);
 
   std::vector<std::unique_ptr<Player>> players_;
   std::stack<Card> deck_;

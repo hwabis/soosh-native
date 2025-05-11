@@ -99,12 +99,12 @@ auto SooshSession::PlayCard(const std::string &playerName, int cardIndex1,
     player.GetHand().erase(player.GetHand().begin() + index2);
 
     auto &inPlay = player.GetInPlay();
-    auto it = std::ranges::find_if(inPlay, [](const Card &card) {
+    auto chopsticksIt = std::ranges::find_if(inPlay, [](const Card &card) {
       return card.GetType() == CardType::Chopsticks;
     });
-    if (it != inPlay.end()) {
-      player.GetHand().push_back(*it);
-      inPlay.erase(it);
+    if (chopsticksIt != inPlay.end()) {
+      player.GetHand().push_back(*chopsticksIt);
+      inPlay.erase(chopsticksIt);
     }
   }
 
@@ -145,6 +145,7 @@ void SooshSession::startRound() {
   gameStage_ = GameStage::Playing;
   auto cardsPerPlayer = 10 - players_.size();
   for (auto &player : players_) {
+    clearHandExceptPuddings(*player);
     for (int i = 0; i < cardsPerPlayer; ++i) {
       if (!deck_.empty()) {
         player->GetHand().push_back(deck_.top());
@@ -241,9 +242,15 @@ auto SooshSession::hasChopsticksInPlay(const Player &player) const -> bool {
   });
 }
 
+void SooshSession::clearHandExceptPuddings(Player &player) {
+  std::erase_if(player.GetInPlay(), [](const Card &card) {
+    return card.GetType() != CardType::Pudding;
+  });
+}
+
 auto SooshSession::SerializeGameState() const -> std::string {
   std::ostringstream oss;
-  oss << "Stage: " << static_cast<int>(gameStage_) << "\n";
+  oss << "Round: " << (numberOfRoundsCompleted_ + 1) << "\n";
   for (const auto &player : players_) {
     oss << player->GetName() << " - " << player->GetPoints() << " points\n";
     for (const auto &card : player->GetInPlay()) {
