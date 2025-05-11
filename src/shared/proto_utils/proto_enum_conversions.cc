@@ -1,8 +1,7 @@
 #include "proto_enum_conversions.h"
 #include <string>
 
-namespace soosh {
-namespace utils {
+namespace soosh::utils {
 
 auto ActionTypeToString(ActionType action) -> std::string {
   switch (action) {
@@ -30,5 +29,4 @@ auto StatusTypeToString(StatusType status) -> std::string {
   }
 }
 
-} // namespace utils
-} // namespace soosh
+} // namespace soosh::utils

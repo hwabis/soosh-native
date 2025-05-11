@@ -3,8 +3,7 @@
 #include <boost/asio.hpp>
 #include <google/protobuf/message.h>
 
-namespace soosh {
-namespace utils {
+namespace soosh::utils {
 
 void AsyncWriteProtobuf(
     boost::asio::ip::tcp::socket &socket,
@@ -70,5 +69,4 @@ void AsyncReadProtobuf(boost::asio::ip::tcp::socket &socket,
       });
 }
 
-} // namespace utils
-} // namespace soosh
+} // namespace soosh::utils

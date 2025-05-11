@@ -1,7 +1,11 @@
+include(${CMAKE_SOURCE_DIR}/cmake/SetTargetDefaults.cmake)
+
 add_library(soosh-proto-utils
   proto_enum_conversions.cc
   proto_streams.cc
 )
+
+set_target_defaults(soosh-proto-utils)
 
 target_include_directories(soosh-proto-utils PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}

@@ -1,4 +1,5 @@
 #include "game_logic/soosh_session.h"
+#include "game_logic/scoring.h"
 #include <algorithm>
 #include <optional>
 #include <random>
@@ -167,10 +168,11 @@ void SooshSession::onTurnEnd() {
     ++numberOfRoundsCompleted_;
     if (numberOfRoundsCompleted_ == maxNumberOfRounds_) {
       gameStage_ = GameStage::Finished;
+      scoring::CalculateRoundPoints(players_, true);
     } else {
       gameStage_ = GameStage::Waiting;
+      scoring::CalculateRoundPoints(players_, false);
     }
-    // todo calculate scores
   } else {
     rotateHands();
   }
@@ -268,13 +270,16 @@ auto SooshSession::SerializeHand(const std::string &playerName) const
         return p_ptr->GetName() == playerName;
       });
   if (it == players_.end()) {
-    return "INVALID PLAYER"; // todo better error handling lol
+    return "INVALID PLAYER\n"; // todo better error handling lol
   }
   Player &player = **it;
 
   std::ostringstream oss;
 
-  if (!player.HasFinishedTurn()) {
+  if (gameStage_ != GameStage::Playing) {
+    oss << "Waiting to start game...\n";
+
+  } else if (!player.HasFinishedTurn()) {
     oss << "Your hand:\n";
     int index = 0;
     for (const auto &card : player.GetHand()) {

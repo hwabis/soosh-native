@@ -4,8 +4,7 @@
 #include <functional>
 #include <memory>
 
-namespace soosh {
-namespace utils {
+namespace soosh::utils {
 
 void AsyncWriteProtobuf(
     boost::asio::ip::tcp::socket &socket,
@@ -32,5 +31,4 @@ void AsyncWriteProtobuf(
                                         std::size_t) { onComplete(ec); });
 }
 
-} // namespace utils
-} // namespace soosh
+} // namespace soosh::utils
