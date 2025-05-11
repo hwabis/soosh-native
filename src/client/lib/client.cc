@@ -42,7 +42,7 @@ void Client::Start() {
     std::string helperMsg = "Available commands:\n"
                             "  start\n"
                             "  play <index1> <index2>\n"
-                            "  quit\n\n";
+                            "  quit\n";
     ui_->PrintStatus(helperMsg);
 
     std::string userInput;

@@ -226,10 +226,9 @@ void SooshSession::resetDeck() {
 auto SooshSession::SerializeGameState() const -> std::string {
   std::ostringstream oss;
   oss << "Stage: " << static_cast<int>(gameStage_) << "\n";
-  for (const auto &player_ptr : players_) {
-    oss << player_ptr->GetName() << " - " << player_ptr->GetPoints()
-        << " points\n";
-    for (const auto &card : player_ptr->GetHand()) {
+  for (const auto &player : players_) {
+    oss << player->GetName() << " - " << player->GetPoints() << " points\n";
+    for (const auto &card : player->GetInPlay()) {
       oss << "  " << card.ToString() << "\n";
     }
   }
