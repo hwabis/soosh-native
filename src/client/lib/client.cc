@@ -48,24 +48,27 @@ void Client::Start() {
     std::string userInput;
     while (true) {
       std::getline(std::cin, userInput);
+      std::stringstream ss(userInput);
+      std::string command;
+      ss >> command;
 
       if (userInput == "quit") {
         ioContext_.stop();
         break;
       }
 
-      soosh::ClientMessage msg;
+      ClientMessage msg;
       if (userInput == "start") {
         msg.set_action(ActionType::Start);
       } else if (userInput.starts_with("play ")) {
+        int index1 = -1, index2 = -1;
+        if (!(ss >> index1)) {
+          ui_->PrintError("Usage: play <index1> [index2]");
+          continue;
+        }
         msg.set_action(ActionType::Play);
-
-        std::stringstream ss(userInput.substr(5));
-        int index1 = 0;
-        ss >> index1;
         msg.mutable_play()->set_card_index1(index1);
 
-        int index2 = 0;
         if (ss >> index2) {
           msg.mutable_play()->set_card_index2(index2);
         }
