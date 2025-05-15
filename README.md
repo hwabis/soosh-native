@@ -6,7 +6,7 @@ CLI-based implementation of [Sushi Go!](https://boardgamegeek.com/boardgame/1334
 
 Install the required dependencies (see `/CMakeLists.txt`). [vcpkg](https://github.com/microsoft/vcpkg) is recommended. Then run:
    ```
-   git clone https://github.com/hwabis/soosh-native.git --recurse-submodules
+   git clone https://github.com/hwabis/soosh-native.git
    cd soosh-native
    mkdir build
    cd build
