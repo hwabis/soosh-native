@@ -12,21 +12,21 @@
 namespace soosh {
 
 Client::Client(const std::string &serverAddress, unsigned short port)
-    : serverEndpoint_(ip::make_address(serverAddress), port),
+    : serverAddress_(serverAddress), port_(port),
       ui_(std::make_shared<ClientUi>()) {}
 
 void Client::Start() {
   try {
     ip::tcp::socket socket(ioContext_);
-    socket.connect(serverEndpoint_);
+    auto endpoints = ip::tcp::resolver(ioContext_)
+                         .resolve(serverAddress_, std::to_string(port_));
+    boost::asio::connect(socket, endpoints);
     if (!socket.is_open()) {
       ui_->PrintError("Socket failed to open.");
       return;
     }
 
-    ui_->PrintStatus(std::string("Connected to server at ") +
-                     serverEndpoint_.address().to_string() + ":" +
-                     std::to_string(serverEndpoint_.port()));
+    ui_->PrintStatus("Connected to server!");
 
     auto session = std::make_shared<ClientSession>(std::move(socket), ui_);
     session->Start();

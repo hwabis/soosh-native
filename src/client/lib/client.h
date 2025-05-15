@@ -17,7 +17,8 @@ public:
 
 private:
   boost::asio::io_context ioContext_;
-  ip::tcp::endpoint serverEndpoint_;
+  std::string serverAddress_;
+  unsigned short port_;
   std::shared_ptr<ClientUi> ui_;
 };
 
