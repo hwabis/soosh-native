@@ -14,7 +14,7 @@ class Server : public std::enable_shared_from_this<Server> {
 public:
   explicit Server(unsigned short port);
   void Start();
-  auto getSessions() const
+  auto GetSessions() const
       -> const std::vector<std::shared_ptr<ClientSession>> &;
 
 private:

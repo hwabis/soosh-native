@@ -17,7 +17,7 @@ void Server::Start() {
   ioContext_.run();
 }
 
-auto Server::getSessions() const
+auto Server::GetSessions() const
     -> const std::vector<std::shared_ptr<ClientSession>> & {
   return sessions_;
 }

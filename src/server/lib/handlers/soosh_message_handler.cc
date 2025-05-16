@@ -79,7 +79,7 @@ void SooshMessageHandler::OnClientDisconnected(
 }
 
 void SooshMessageHandler::broadcastGameStateAndHands() {
-  for (const auto &session : server_->getSessions()) {
+  for (const auto &session : server_->GetSessions()) {
     ServerMessage updateMessage;
     updateMessage.set_status(StatusType::Update);
     updateMessage.set_data(gameSession_->SerializeGameState());
